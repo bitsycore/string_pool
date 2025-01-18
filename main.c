@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "string_pool/string_pool_api.h"
+#include "string_pool/string_pool.h"
 
 void print_string_info(const STRING_REF string) {
     printf("String: %s (ptr: %p, ref_count: %zu)\n", string->str, (void *) string->str, string->ref_count);
@@ -30,11 +30,10 @@ int main() {
     print_string_info(ps9);
 
     // Check pointer equality
-    if (STRING_CMP(ps1, ps4, ps5, ps6, ps7)){
+    if (STRING_CMP(ps1, ps4) && STRING_CMP_VA(ps5, ps6, ps7))
         printf("ps1 and ps4 point to the same string.\n");
-    } else {
+    else
         printf("ps1 and ps4 point to different strings.\n");
-    }
 
     // Release strings
     STRING_RELEASE(ps1);
@@ -42,11 +41,8 @@ int main() {
     STRING_RELEASE(ps3);
     STRING_RELEASE(ps4);
     STRING_RELEASE(ps5);
-    STRING_RELEASE(ps6);
-    STRING_RELEASE(ps7);
-    STRING_RELEASE(ps8);
-    STRING_RELEASE(ps9);
 
-    deinit_global_pool();
+    STRING_POOL_RELEASE();
+
     return 0;
 }

@@ -1,9 +1,9 @@
-#include "string_pool.h"
+#include "private.h"
 
 #include <stdarg.h>
 #include <stdbool.h>
 
-#include "string_pool_api.h"
+#include "string_pool.h"
 #include "../common/error_handling.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,10 +16,8 @@ StringPool *GLOBAL_POOL = NULL;
 // MARK: HASH FUNCTION
 // =====================================================================================================================
 
-// Configuration
 #define HASH_TABLE_SIZE 256
 
-// Simple hash function for strings
 static unsigned long hash(const char *str) {
     unsigned long hash = 5381;
     int c;
@@ -42,6 +40,7 @@ static void string_free(String *ps) {
 // =====================================================================================================================
 // MARK: STRING POOL
 // =====================================================================================================================
+
 // Function to get a pooled string from the pool by string value
 String *string_pool_get_string(const StringPool *pool, const char *str) {
     if (!pool)
@@ -75,21 +74,31 @@ StringPool *string_pool_new() {
 }
 
 
-// Function to free the string pool
 void string_pool_free(StringPool **in_pool) {
     if (!in_pool || !*in_pool)
         EXIT_ERROR("Invalid string pool");
 
     StringPool *pool = *in_pool;
+    size_t unreleased_count = 0;
+
 
     for (size_t i = 0; i < HASH_TABLE_SIZE; i++) {
         String *current = pool->hash_table[i];
         while (current) {
             String *temp = current;
             current = current->next;
+            if (temp->ref_count > 1) {
+                unreleased_count += temp->ref_count; // count all the references
+            }
             string_free(temp);
         }
     }
+    if (unreleased_count > 0) {
+        char buffer[64]; // Adjust buffer size if needed
+        snprintf(buffer, sizeof(buffer), "String Pool freed with %zu unreleased strings", unreleased_count);
+        WARN(buffer);
+    }
+
     free(pool->hash_table);
     free(pool);
     *in_pool = NULL;
@@ -179,7 +188,7 @@ void string_release(StringPool *pool, String **out_ptr_string) {
     *out_ptr_string = NULL;
 }
 
-bool string_cmp(String *first, ...) {
+bool string_cmp_va(String *first, ...) {
     if (first == NULL) return false;
 
     va_list args;
@@ -214,4 +223,9 @@ StringPool* get_global_pool() {
 
 void deinit_global_pool() {
     string_pool_free(&GLOBAL_POOL);
+    GLOBAL_POOL = NULL;
+}
+
+void init_global_pool() {
+    get_global_pool_singleton();
 }
