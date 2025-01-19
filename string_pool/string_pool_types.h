@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#define HASH_TABLE_SIZE 256
+#include "config.h"
 
 typedef struct String String;
 typedef struct StringPool StringPool;
@@ -18,7 +18,7 @@ struct String {
 };
 
 struct StringPool {
-	String** hash_table;
+	String* hash_table[HASH_TABLE_SIZE];
 	size_t count;
 };
 

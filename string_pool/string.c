@@ -8,11 +8,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "config.h"
 #include "global_pool.h"
 #include "string_pool.h"
 
 #include "../common/error_handling.h"
 #include "../common/hash.h"
+
+// =========================================
+// MARK: MEMORY MANAGEMENT
+// =========================================
 
 void string_free(String* ps) {
 	free(ps->str);
@@ -32,6 +37,10 @@ String* string_alloc(const char* str) {
 	new_string->ref_count = 1;
 	return new_string;
 }
+
+// =========================================
+// MARK: ADD and REMOVE
+// =========================================
 
 String* string_new(StringPool* pool, const char* str) {
 	// =========================================
@@ -127,8 +136,9 @@ bool string_cmp_va(const String* first, ...) {
 	return true;
 }
 
-char* internal_string_replace_str(const char* original_str, const size_t original_str_int, const char* target,
-                                  const size_t target_len, const char* replacement, const size_t replacement_len) {
+static char* internal_string_replace_str(const char* original_str, const size_t original_str_int, const char* target,
+                                         const size_t target_len, const char* replacement,
+                                         const size_t replacement_len) {
 	size_t result_len = 0;
 	size_t alloc_len = original_str_int + 1;
 	char* result_str = malloc(alloc_len);
@@ -194,8 +204,14 @@ String* string_replace(StringPool* pool, const String* original, const char* tar
 		pool = get_global_pool_singleton();
 	}
 
-	const char* result_str = internal_string_replace_str(original->str, original->length, target, target_len,
-	                                                     replacement, strlen(replacement));
+	const char* result_str = internal_string_replace_str(
+		original->str,
+		original->length,
+		target,
+		target_len,
+		replacement,
+		strlen(replacement)
+	);
 	String* result = string_new(pool, result_str);
 	free((void*) result_str);
 

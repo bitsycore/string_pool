@@ -11,12 +11,12 @@ int main() {
 	// STRING_CMP & STRING_CMP_VA test
 	if (!S_CMP(ps1, ps2))
 		return -1;
-
 	printf("STRING_CMP: work.\n");
 
 	if (S_CMP_VA(ps3, ps2, ps1))
 		return -1;
 	printf("STRING_CMP_VA: work.\n");
+
 
 	// ===============================================
 	// STRING_FIND test
@@ -67,13 +67,14 @@ int main() {
 	puts(final_string->str);
 
 	String* abc = SB_START()
+
 		String* test = S_NEW("Test replace NEW, and the NEW");
 		String* replaced = S_REPLACE(test, "NEW", "Hi");
-		const int age = 30;
+		const int age = 11;
 		SB_APPEND(replaced);
 		SB_APPEND_STR(" ");
 		SB_APPEND_STR("Name: ");
-		SB_APPEND_FORMAT("%s, ", "John");
+		SB_APPEND_FORMAT("%s, ", "BOB");
 		SB_APPEND_STR("Age: ");
 		SB_APPEND_FORMAT("%d", age);
 

@@ -63,10 +63,10 @@ StringPool* string_pool_new() {
 		EXIT_ERROR("Failed to allocate String Pool");
 
 	pool->count = 0;
-	pool->hash_table = calloc(HASH_TABLE_SIZE, sizeof(String*));
 
-	if (!pool->hash_table)
-		EXIT_ERROR("Failed to allocate String Hash Table");
+	for (size_t i = 0; i < HASH_TABLE_SIZE; i++) {
+		pool->hash_table[i] = NULL;
+	}
 
 	return pool;
 }
@@ -104,7 +104,6 @@ void string_pool_free(StringPool** in_pool) {
 		WARN(buffer);
 	}
 
-	free(pool->hash_table);
 	free(pool);
 	*in_pool = NULL;
 }
