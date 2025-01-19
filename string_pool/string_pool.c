@@ -37,82 +37,11 @@ static void string_free(String *ps) {
     free(ps);
 }
 
-// =====================================================================================================================
-// MARK: STRING POOL
-// =====================================================================================================================
-
-// Function to get a pooled string from the pool by string value
-String *string_pool_get_string(const StringPool *pool, const char *str) {
-    if (!pool)
-        EXIT_ERROR("String Pool is Null");
-
-    const unsigned long index = hash(str);
-    String *current = pool->hash_table[index];
-
-    while (current) {
-        if (strcmp(current->str, str) == 0) {
-            current->ref_count++; // Increment reference count
-            return current; // Return existing string
-        }
-        current = current->next;
-    }
-    return NULL; // Not found
-}
-
-
-// Function to create a new string pool
-StringPool *string_pool_new() {
-    StringPool *pool = malloc(sizeof(StringPool));
-    if (!pool)
-        EXIT_ERROR("Failed to allocate String Pool");
-
-    pool->count = 0;
-    pool->hash_table = calloc(HASH_TABLE_SIZE, sizeof(String *));
-    if (!pool->hash_table)
-        EXIT_ERROR("Failed to allocate String Hash Table");
-    return pool;
-}
-
-
-void string_pool_free(StringPool **in_pool) {
-    if (!in_pool || !*in_pool)
-        EXIT_ERROR("Invalid string pool");
-
-    StringPool *pool = *in_pool;
-    size_t unreleased_count = 0;
-
-
-    for (size_t i = 0; i < HASH_TABLE_SIZE; i++) {
-        String *current = pool->hash_table[i];
-        while (current) {
-            String *temp = current;
-            current = current->next;
-            if (temp->ref_count > 1) {
-                unreleased_count += temp->ref_count; // count all the references
-            }
-            string_free(temp);
-        }
-    }
-    if (unreleased_count > 0) {
-        char buffer[64]; // Adjust buffer size if needed
-        snprintf(buffer, sizeof(buffer), "String Pool freed with %zu unreleased strings", unreleased_count);
-        WARN(buffer);
-    }
-
-    free(pool->hash_table);
-    free(pool);
-    *in_pool = NULL;
-}
-
-
 // Function to add a string to the pool
 String *string_new(StringPool *pool, const char *str) {
-    // Check if pool is null and initialize if needed
+    // If null, get singleton
     if (pool == NULL) {
-        if (GLOBAL_POOL == NULL) {
-            get_global_pool_singleton(); // Auto-initialize if global pool is null
-        }
-        pool = GLOBAL_POOL;
+        pool = get_global_pool_singleton();
     }
 
     const unsigned long index = hash(str);
@@ -207,17 +136,85 @@ bool string_cmp_va(String *first, ...) {
 }
 
 // =====================================================================================================================
+// MARK: STRING POOL
+// =====================================================================================================================
+
+// Function to get a pooled string from the pool by string value
+String *string_pool_get_string(const StringPool *pool, const char *str) {
+    if (!pool)
+        EXIT_ERROR("String Pool is Null");
+
+    const unsigned long index = hash(str);
+    String *current = pool->hash_table[index];
+
+    while (current) {
+        if (strcmp(current->str, str) == 0) {
+            current->ref_count++; // Increment reference count
+            return current; // Return existing string
+        }
+        current = current->next;
+    }
+    return NULL; // Not found
+}
+
+
+// Function to create a new string pool
+StringPool *string_pool_new() {
+    StringPool *pool = malloc(sizeof(StringPool));
+    if (!pool)
+        EXIT_ERROR("Failed to allocate String Pool");
+
+    pool->count = 0;
+    pool->hash_table = calloc(HASH_TABLE_SIZE, sizeof(String *));
+    if (!pool->hash_table)
+        EXIT_ERROR("Failed to allocate String Hash Table");
+    return pool;
+}
+
+
+void string_pool_free(StringPool **in_pool) {
+    if (!in_pool || !*in_pool)
+        EXIT_ERROR("Invalid string pool");
+
+    StringPool *pool = *in_pool;
+    size_t unreleased_count_ref = 0;
+    size_t unreleased_count_string = 0;
+
+    for (size_t i = 0; i < HASH_TABLE_SIZE; i++) {
+        String *current = pool->hash_table[i];
+        while (current) {
+            String *temp = current;
+            current = current->next;
+            if (temp->ref_count > 1) {
+                unreleased_count_ref += temp->ref_count; // count all the references
+                unreleased_count_string++;
+            }
+            string_free(temp);
+        }
+    }
+    if (unreleased_count_ref > 0) {
+        char buffer[128]; // Adjust buffer size if needed
+        snprintf(buffer, sizeof(buffer), "String Pool freed with %zu unreleased handle, for %zu strings", unreleased_count_ref, unreleased_count_string);
+        WARN(buffer);
+    }
+
+    free(pool->hash_table);
+    free(pool);
+    *in_pool = NULL;
+}
+
+// =====================================================================================================================
 // MARK: GLOBAL INITIALIZER
 // =====================================================================================================================
 
-StringPool* get_global_pool_singleton() {
+StringPool *get_global_pool_singleton() {
     if (GLOBAL_POOL == NULL) {
         GLOBAL_POOL = string_pool_new();
     }
     return GLOBAL_POOL;
 }
 
-StringPool* get_global_pool() {
+StringPool *get_global_pool() {
     return GLOBAL_POOL;
 }
 

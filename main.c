@@ -8,16 +8,33 @@ void print_string_info(const STRING_REF string) {
 
 int main() {
     STRING_REF ps1 = STRING_NEW("Hello");
-    STRING_REF ps2 = STRING_NEW(" ");
-    STRING_REF ps3 = STRING_NEW("World");
-    STRING_REF ps4 = STRING_NEW("Hello");
+    STRING_REF ps2 = STRING_NEW("World");
+    STRING_REF ps3 = STRING_NEW("World5");
+    STRING_REF ps4 = STRING_NEW("Hello5");
+
+    STRING_REF pool[100];
+
+    for (int k = 0; k < 10000; k++) {
+        for (int j = 0; j < 100; j++) {
+            for (int i = 0; i < 100; i++) {
+                char buffer[64];
+                snprintf(buffer, sizeof(buffer), "hello+%d", (i*j));
+                STRING_REF ps = STRING_NEW(buffer);
+                pool[i] = ps;
+            }
+        }
+    }
+
+    for (int i = 0; i < 100; i++) {
+        print_string_info(pool[i]);
+    }
 
     // Duplicate string
-    STRING_REF ps5 = STRING_NEW("Hello");
-    STRING_REF ps6 = STRING_NEW("Hello");
-    STRING_REF ps7 = STRING_NEW("Hello");
-    STRING_REF ps8 = STRING_NEW("Hello");
-    STRING_REF ps9 = STRING_NEW("Hello");
+    STRING_REF ps5 = STRING_NEW("Hello6");
+    STRING_REF ps6 = STRING_NEW("Hello7");
+    STRING_REF ps7 = STRING_NEW("Hello8");
+    STRING_REF ps8 = STRING_NEW("Hello9");
+    STRING_REF ps9 = STRING_NEW("Hello10");
 
     print_string_info(ps1);
     print_string_info(ps2);
