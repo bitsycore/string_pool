@@ -1,23 +1,41 @@
-#ifndef STRING_POOL_API_H
-#define STRING_POOL_API_H
+#ifndef STRING_POOL_H
+#define STRING_POOL_H
 
-#include "string_pool_extra.h"
+#include "string_pool_types.h"
 
 // =====================================================================================================================
-// MARK: Simplified API
+// MARK: String Pool API
 // =====================================================================================================================
 
-#define STRING_PTR String*
-#define STRING_NEW(str) string_new(NULL, str)
-#define STRING_RELEASE(ptr) string_release(NULL, &ptr)
+/**
+ * Create a new StringPool
+ * @return Pointer to the new StringPool
+ */
+StringPool *string_pool_new();
 
-#define STRING_CMP(first, second) (first->str == second->str)
-#define STRING_CMP_VA(first, ...) string_cmp_va(first, __VA_ARGS__, NULL)
-#define STRING_LENGTH(ptr) ptr->length
-#define STRING_FIND(str) string_pool_find_string(NULL, str)
+/**
+ * Free the memory allocated for the StringPool
+ * @param in_pool Pointer to the StringPool pointer that is set to NULL after the pool is freed
+ */
+void string_pool_free(StringPool **in_pool);
 
-#define STRING_POOL_RELEASE() deinit_global_pool();
-#define STRING_POOL_COUNT() get_global_pool_singleton()->count
-#define STRING_POOL_REF() get_pool_ref_count(NULL)
+/**
+ * Find a string in the pool
+ * @param pool Pointer to the StringPool
+ * @param str The string to be found
+ * @return Pointer to the String if found, NULL otherwise
+ */
+String *string_pool_find_string(StringPool *pool, const char *str);
+
+/**
+ * Find a string in the pool with a specific index
+ * @param pool Pointer to the StringPool
+ * @param str The string to be found
+ * @param index The index of the string in the hash table
+ * @return Pointer to the String if found, NULL otherwise
+ */
+String *string_pool_find_string_with_index(StringPool *pool, const char *str, size_t index);
+
+size_t get_pool_ref_count(StringPool *pool);
 
 #endif
