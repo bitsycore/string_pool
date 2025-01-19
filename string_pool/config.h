@@ -1,21 +1,33 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define HASH_TABLE_SIZE 8191 // Prime number 8191, 16381, or 32749
-#define HASH_FUNCTION HASH_DJB2
+// ====================
+// Hash type "enum"
+#define HASH_FNV1A 1
+#define HASH_OPT_FNV1A 2
+#define HASH_DJB2 3
+#define HASH_SDBM 4
+#define HASH_MURMUR3_32 5
 
+// ====================
+// MARK: CONFIG
+#define HASH_FUNCTION HASH_OPT_FNV1A
+#define HASH_TABLE_SIZE 16381 // Prime number 8191, 16381, or 32749
+
+// ====================
+// SELECTOR
 #if HASH_FUNCTION == HASH_FNV1A
-	#define HASH_SELECTED(str, table_size) hash_fnv1a(str, table_size)
+#define hash(str, table_size) hash_fnv1a(str, table_size)
 #elif HASH_FUNCTION == HASH_OPT_FNV1A
-	#define HASH_SELECTED(str, table_size) hash_fnv1a_optimized(str, table_size)
+#define hash(str, table_size) hash_fnv1a_optimized(str, table_size, 32)
 #elif HASH_FUNCTION == HASH_DJB2
-	#define HASH_SELECTED(str, table_size) hash_djb2(str, table_size)
+#define hash(str, table_size) hash_djb2(str, table_size)
 #elif HASH_FUNCTION == HASH_SDBM
-	#define HASH_SELECTED(str, table_size) hash_sdbm(str, table_size)
+#define hash(str, table_size) hash_sdbm(str, table_size)
+#elif HASH_FUNCTION == HASH_MURMUR3_32
+#define hash(str, table_size) hash_murmur3_32(str, table_size)
 #else
-	#define HASH_SELECTED(str, table_size) hash_djb2(str, table_size)
+#define hash(str, table_size) hash_djb2(str, table_size)
 #endif
 
-#define hash(str, table_size) HASH_SELECTED(str, table_size)
-
-#endif //CONFIG_H
+#endif // CONFIG_H

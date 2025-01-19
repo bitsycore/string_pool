@@ -29,27 +29,22 @@ int main() {
 
 	// ===============================================
 	// Lots of init test
-	String* str_test = SB_START()
-
-		for (int k = 0; k < 10; k++) {
-			for (int j = 0; j < 10; j++) {
-				for (int i = 0; i < 10; i++) {
-					char buffer[10 + 20 + 20 + 20];
-					snprintf(buffer, sizeof(buffer), i % 2 == 0 ? "%d+%d+%d-WORLD" : "%d+%d+%d-HELLO", i, j, k);
-					const String* string = S_NEW(buffer);
-					SB_APPEND_FORMAT(
-						"String: %s (ptr: %p, ref_count: %zu)\n",
-						string->str,
-						(void *) string->str,
-						string->ref_count
-					);
-				}
+	for (int j = 0; j < 1; j++) {
+		String* str_test = SB_START()
+			for (int i = 0; i < 100; i++) {
+				char buffer[10 + 20];
+				snprintf(buffer, sizeof(buffer), i % 2 == 0 ? "%d-WORLD" : "%d-HELLO", (j * 100) + i);
+				const String* string = S_NEW(buffer);
+				SB_APPEND_FORMAT(
+					"String: %s (ptr: %p, ref_count: %zu)\n",
+					string->str,
+					(void *) string->str,
+					string->ref_count
+				);
 			}
-		}
-
-	SB_END(str_test);
-	puts(str_test->str);
-
+		SB_END(str_test);
+		puts(str_test->str);
+	}
 	// ===============================================
 	// BUILDER TEST
 	String* final_string = SB_START()
