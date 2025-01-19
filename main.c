@@ -2,10 +2,6 @@
 
 #include "string_pool/api.h"
 
-void print_string_info(const String* string) {
-	printf("String: %s (ptr: %p, ref_count: %zu)\n", string->str, (void*) string->str, string->ref_count);
-}
-
 int main() {
 	String* ps1 = S_NEW("Hello");
 	String* ps2 = S_NEW("Hello");
@@ -22,10 +18,9 @@ int main() {
 		return -1;
 	printf("STRING_CMP_VA: work.\n");
 
-
 	// ===============================================
 	// STRING_FIND test
-	String* ps1_eq = SP_FIND("Hello");
+	String* ps1_eq = SP_GET_STRING("Hello");
 
 	if (!S_CMP(ps1, ps1_eq))
 		return -1;

@@ -14,7 +14,7 @@
 #define SP_FREE() deinit_global_pool();
 #define SP_COUNT_STR() get_global_pool_singleton()->count
 #define SP_COUNT_REF() string_pool_count_ref(NULL)
-#define SP_FIND(str) string_pool_find_string(NULL, str);
+#define SP_GET_STRING(string) string_pool_get_string(NULL, string);
 
 // =====================================================================================================================
 // MARK: String API
@@ -27,12 +27,13 @@
 #define S_CMP_VA(first, ...) string_cmp_va(first, __VA_ARGS__, NULL)
 #define S_LENGTH(ptr) ptr->length
 #define S_REPLACE(original, target, replacement) string_replace(NULL, original, target, replacement)
+#define S_REPLACE_STR(original, target, replacement) string_replace_str(NULL, original, target, replacement)
 
 // =====================================================================================================================
 // MARK: StringBuilder API
 // =====================================================================================================================
 
-#define SB_START() (String*) NULL;{ StringBuilder* __STR_123_BUILDER__ = string_builder_new(NULL);
+#define SB_START() NULL;{ StringBuilder* __STR_123_BUILDER__ = string_builder_new(NULL);
 
 #define SB_APPEND(str) string_builder_append(__STR_123_BUILDER__, str)
 #define SB_APPEND_STR(str) string_builder_append_str(__STR_123_BUILDER__, str)
