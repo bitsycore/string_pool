@@ -41,7 +41,7 @@ String *string_pool_find_string_with_index(StringPool *pool, const char *str, co
     return NULL;
 }
 
-size_t get_pool_ref_count(StringPool *pool) {
+size_t string_pool_count_ref(StringPool *pool) {
     if (!pool) pool = get_global_pool();
     if (!pool)
         EXIT_ERROR("in StringPool and Global StringPool is Null");
@@ -78,7 +78,7 @@ void string_pool_free(StringPool **in_pool) {
 
     StringPool *pool = *in_pool;
 
-    const size_t unreleased_count_ref = get_pool_ref_count(pool);
+    const size_t unreleased_count_ref = string_pool_count_ref(pool);
     const size_t unreleased_count_string = pool->count;
 
     for (size_t i = 0; i < HASH_TABLE_SIZE; i++) {

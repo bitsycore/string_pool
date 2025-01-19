@@ -36,6 +36,6 @@ String *string_pool_find_string(StringPool *pool, const char *str);
  */
 String *string_pool_find_string_with_index(StringPool *pool, const char *str, size_t index);
 
-size_t get_pool_ref_count(StringPool *pool);
+size_t string_pool_count_ref(StringPool *pool);
 
 #endif

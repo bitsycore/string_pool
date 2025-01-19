@@ -11,32 +11,28 @@
 // MARK: StringPool API
 // =====================================================================================================================
 
-#define STRINGPOOL_FREE() deinit_global_pool();
-#define STRINGPOOL_COUNT_STR() get_global_pool_singleton()->count
-#define STRINGPOOL_COUNT_REF() get_pool_ref_count(NULL)
-#define STRINGPOOL_FIND(str) string_pool_find_string(NULL, str);
+#define SP_FREE() deinit_global_pool();
+#define SP_COUNT_STR() get_global_pool_singleton()->count
+#define SP_COUNT_REF() string_pool_count_ref(NULL)
+#define SP_FIND(str) string_pool_find_string(NULL, str);
 
 // =====================================================================================================================
 // MARK: String API
 // =====================================================================================================================
 
-#define STRING_PTR String*
+#define S_NEW(str) string_new(NULL, str)
+#define S_RELEASE(ptr) string_release(NULL, &ptr)
 
-#define STRING_NEW(str) string_new(NULL, str)
-#define STRING_RELEASE(ptr) string_release(NULL, &ptr)
-
-#define STRING_CMP(first, second) (first->str == second->str)
-#define STRING_CMP_VA(first, ...) string_cmp_va(first, __VA_ARGS__, NULL)
-#define STRING_LENGTH(ptr) ptr->length
-#define STRING_REPLACE(original, target, replacement) string_replace(NULL, original, target, replacement)
+#define S_CMP(first, second) (first->str == second->str)
+#define S_CMP_VA(first, ...) string_cmp_va(first, __VA_ARGS__, NULL)
+#define S_LENGTH(ptr) ptr->length
+#define S_REPLACE(original, target, replacement) string_replace(NULL, original, target, replacement)
 
 // =====================================================================================================================
 // MARK: StringBuilder API
 // =====================================================================================================================
 
-#define STRING_BUILDER_PTR StringBuilder*
-
-#define SB_START() (STRING_PTR) NULL;{ StringBuilder* __STR_123_BUILDER__ = string_builder_new(NULL);
+#define SB_START() (String*) NULL;{ StringBuilder* __STR_123_BUILDER__ = string_builder_new(NULL);
 
 #define SB_APPEND(str) string_builder_append(__STR_123_BUILDER__, str)
 #define SB_APPEND_STR(str) string_builder_append_str(__STR_123_BUILDER__, str)
