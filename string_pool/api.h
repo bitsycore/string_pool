@@ -36,13 +36,14 @@
 
 #define STRING_BUILDER_PTR StringBuilder*
 
-#define STRING_BUILDER_START() (STRING_PTR) NULL;{ StringBuilder* __STR_123_BUILDER__ = string_builder_new(NULL);
+#define SB_START() (STRING_PTR) NULL;{ StringBuilder* __STR_123_BUILDER__ = string_builder_new(NULL);
 
-#define STRING_BUILDER_APPEND(str) string_builder_append(__STR_123_BUILDER__, str)
-#define STRING_BUILDER_APPEND_STR(str) string_builder_append_str(__STR_123_BUILDER__, str)
-#define STRING_BUILDER_APPEND_FORMAT(str, ...) string_builder_append_format(__STR_123_BUILDER__, str, __VA_ARGS__)
+#define SB_APPEND(str) string_builder_append(__STR_123_BUILDER__, str)
+#define SB_APPEND_STR(str) string_builder_append_str(__STR_123_BUILDER__, str)
+#define SB_APPEND_INT(int) string_builder_append_format(__STR_123_BUILDER__, "%d", int)
+#define SB_APPEND_FORMAT(str, ...) string_builder_append_format(__STR_123_BUILDER__, str, __VA_ARGS__)
 #define STRING_BUILDER_TO_STRING() string_builder_to_string(__STR_123_BUILDER__)
 
-#define STRING_BUILDER_END(final) final = string_builder_to_string(__STR_123_BUILDER__);string_builder_release(&__STR_123_BUILDER__); }
+#define SB_END(final) final = string_builder_to_string(__STR_123_BUILDER__);string_builder_release(&__STR_123_BUILDER__); }
 
 #endif

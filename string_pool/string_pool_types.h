@@ -27,17 +27,18 @@ struct StringBuilderNode {
         STRING_BUILDER_NODE_TYPE_STR,
         STRING_BUILDER_NODE_TYPE_STRING,
     } type;
+
     union {
-        char * str;
-        String * string;
+        char *str;
+        String *string;
     };
 
-    StringBuilderNode * next;
+    StringBuilderNode *next;
 };
 
 struct StringBuilder {
     StringPool *pool;
-    StringBuilderNode* strings;
+    StringBuilderNode *strings;
     size_t count;
 };
 

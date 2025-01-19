@@ -34,15 +34,15 @@ int main() {
 
     // ===============================================
     // Lots of init test
-    STRING_PTR str_test = STRING_BUILDER_START()
+    STRING_PTR str_test = SB_START()
 
         for (int k = 0; k < 10; k++) {
             for (int j = 0; j < 10; j++) {
                 for (int i = 0; i < 10; i++) {
-                    char buffer[10 + 20];
-                    snprintf(buffer, sizeof(buffer), i % 2 == 0 ? "hello+%d+%d+%d" : "%d+%d+%d-world", i, j, k);
+                    char buffer[10 + 20 + 20 + 20];
+                    snprintf(buffer, sizeof(buffer), "%d+%d+%d-world", i, j, k);
                     const STRING_PTR string = STRING_NEW(buffer);
-                    STRING_BUILDER_APPEND_FORMAT(
+                    SB_APPEND_FORMAT(
                         "String: %s (ptr: %p, ref_count: %zu)\n",
                         string->str,
                         (void *) string->str,
@@ -52,37 +52,37 @@ int main() {
             }
         }
 
-    STRING_BUILDER_END(str_test);
+    SB_END(str_test);
     puts(str_test->str);
 
     // ===============================================
     // BUILDER TEST
-    STRING_PTR final_string = STRING_BUILDER_START()
+    STRING_PTR final_string = SB_START()
 
         const int age = 30;
-        STRING_BUILDER_APPEND(ps2);
-        STRING_BUILDER_APPEND_STR(" ");
-        STRING_BUILDER_APPEND_STR("Name: ");
-        STRING_BUILDER_APPEND_FORMAT("%s, ", "John");
-        STRING_BUILDER_APPEND_STR("Age: ");
-        STRING_BUILDER_APPEND_FORMAT("%d", age);
+        SB_APPEND(ps2);
+        SB_APPEND_STR(" --- ");
+        SB_APPEND_STR("Name: ");
+        SB_APPEND_FORMAT("%s, ", "John");
+        SB_APPEND_STR("Age: ");
+        SB_APPEND_INT(age);
 
-    STRING_BUILDER_END(final_string);
+    SB_END(final_string);
 
     puts(final_string->str);
 
-    STRING_PTR abc = STRING_BUILDER_START()
+    STRING_PTR abc = SB_START()
         String *test = STRING_NEW("Test replace NEW, and the NEW");
         String *replaced = STRING_REPLACE(test, "NEW", "Hi");
         const int age = 30;
-        STRING_BUILDER_APPEND(replaced);
-        STRING_BUILDER_APPEND_STR(" ");
-        STRING_BUILDER_APPEND_STR("Name: ");
-        STRING_BUILDER_APPEND_FORMAT("%s, ", "John");
-        STRING_BUILDER_APPEND_STR("Age: ");
-        STRING_BUILDER_APPEND_FORMAT("%d", age);
+        SB_APPEND(replaced);
+        SB_APPEND_STR(" ");
+        SB_APPEND_STR("Name: ");
+        SB_APPEND_FORMAT("%s, ", "John");
+        SB_APPEND_STR("Age: ");
+        SB_APPEND_FORMAT("%d", age);
 
-    STRING_BUILDER_END(abc);
+    SB_END(abc);
 
     puts(abc->str);
 

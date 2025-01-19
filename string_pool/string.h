@@ -50,6 +50,6 @@ bool string_cmp_va(const String *first, ...);
  * @param replacement The replacement string
  * @return Pointer to the new string
  */
-String* string_replace(StringPool *pool, const String *original, const char *target, const char *replacement);
+String *string_replace(StringPool *pool, const String *original, const char *target, const char *replacement);
 
 #endif //STRING_H
