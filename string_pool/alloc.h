@@ -2,6 +2,8 @@
 #define ALLOC_H
 
 #include <stddef.h>
+#include <stdint.h>
+
 #include "config.h"
 
 #if POOR_GRIND == 1
@@ -22,6 +24,6 @@ void sp_alloc_plus();
 
 void sp_alloc_minus();
 
-size_t sp_alloc_get();
+int32_t sp_alloc_get();
 
 #endif //ALLOC_H
