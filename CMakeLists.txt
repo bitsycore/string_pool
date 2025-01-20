@@ -20,6 +20,8 @@ add_library(
         common/hash.c
         common/hash.h
         common/maths.h
+        string_pool/scope_context.c
+        string_pool/scope_context.h
 )
 
 add_executable(testStringPool main.c)

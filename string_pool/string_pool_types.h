@@ -14,7 +14,7 @@ struct String {
 	char* str;
 	size_t length;
 	size_t ref_count;
-	String* next;
+	String* __next;
 };
 
 struct StringPool {

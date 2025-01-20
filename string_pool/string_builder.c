@@ -41,6 +41,7 @@ static StringBuilderNode* string_builder_node_new_string(String* string) {
 	StringBuilderNode* node = malloc(sizeof(StringBuilderNode));
 	if (!node)
 		EXIT_ERROR("Failed to allocate StringBuilderNode");
+	string->ref_count++;
 	node->type = STRING_BUILDER_NODE_TYPE_STRING;
 	node->string = string;
 	node->next = NULL;
@@ -158,8 +159,10 @@ String* string_builder_to_string(StringBuilder* builder) {
 	for (size_t j = 0; j < builder->count; j++) {
 		if (nodes[j]->type == STRING_BUILDER_NODE_TYPE_STR)
 			strcat(result, nodes[j]->str);
-		else if (nodes[j]->type == STRING_BUILDER_NODE_TYPE_STRING)
+		else if (nodes[j]->type == STRING_BUILDER_NODE_TYPE_STRING) {
 			strcat(result, nodes[j]->string->str);
+			string_release(NULL, &nodes[j]->string);
+		}
 	}
 
 	String* final_string = string_new(builder->pool, result);

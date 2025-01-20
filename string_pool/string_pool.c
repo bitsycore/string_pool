@@ -19,8 +19,12 @@ String* string_pool_get_string(StringPool* pool, const char* str) {
 		EXIT_ERROR("in StringPool and Global StringPool is Null");
 
 	const size_t index = hash(str, HASH_TABLE_SIZE);
+	String* result = string_pool_get_string_with_index(pool, str, index);
 
-	return string_pool_get_string_with_index(pool, str, index);
+	if (result != NULL)
+		result->ref_count--;
+
+	return result;
 }
 
 String* string_pool_get_string_with_index(StringPool* pool, const char* str, const size_t index) {
@@ -35,7 +39,7 @@ String* string_pool_get_string_with_index(StringPool* pool, const char* str, con
 			current->ref_count++;
 			return current;
 		}
-		current = current->next;
+		current = current->__next;
 	}
 
 	return NULL;
@@ -51,7 +55,7 @@ size_t string_pool_count_ref(StringPool* pool) {
 		const String* current = pool->hash_table[i];
 		while (current) {
 			ref_count += current->ref_count;
-			current = current->next;
+			current = current->__next;
 		}
 	}
 	return ref_count;
@@ -85,7 +89,7 @@ void string_pool_free(StringPool** in_pool) {
 		String* current = pool->hash_table[i];
 		while (current) {
 			String* temp = current;
-			current = current->next;
+			current = current->__next;
 			string_free(temp);
 		}
 	}

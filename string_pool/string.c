@@ -65,7 +65,7 @@ String* string_new(StringPool* pool, const char* str) {
 
 	// =========================================
 	// Insert in the hash table at the head
-	new_string->next = pool->hash_table[index];
+	new_string->__next = pool->hash_table[index];
 	pool->hash_table[index] = new_string;
 	pool->count++;
 
@@ -98,18 +98,15 @@ void string_release(StringPool* pool, String** out_ptr_string) {
 
 		while (current) {
 			if (current == ptr_string) {
-				if (prev) {
-					prev->next = current->next;
-				} else {
-					pool->hash_table[index] = current->next;
-				}
-				current->next = NULL;
+				if (prev) prev->__next = current->__next;
+				else pool->hash_table[index] = current->__next;
+				current->__next = NULL;
 				string_free(current);
 				pool->count--;
 				break;
 			}
 			prev = current;
-			current = current->next;
+			current = current->__next;
 		}
 	}
 
