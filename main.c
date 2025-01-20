@@ -122,6 +122,6 @@ int main() {
 	// ===============================================
 	// Release Pool and Quit
 	SP_GLOBAL_FREE();
-	printf("NOT FREED %d", sp_alloc_get());
+	printf("---------------------\nMEMORY BLOCK NOT FREED = %d\n---------------------", sp_alloc_get());
 	return 0;
 }
