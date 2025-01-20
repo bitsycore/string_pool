@@ -10,6 +10,7 @@
 
 #include "config.h"
 #include "global_pool.h"
+#include "string_page.h"
 #include "string_pool.h"
 
 #include "../common/error_handling.h"
@@ -21,20 +22,14 @@
 
 void string_free(String* ps) {
 	free(ps->str);
-	free(ps);
 }
 
-String* string_alloc(const char* str) {
-	String* new_string = malloc(sizeof(String));
-	if (!new_string)
-		EXIT_ERROR("Failed to allocate String");
+String* string_next(StringPage * string_page, const char * str, size_t index) {
+	String* new_string = string_page_next_string(string_page);
 	new_string->str = strdup(str);
-	if (!new_string->str) {
-		free(new_string);
-		EXIT_ERROR("Failed to duplicate string");
-	}
 	new_string->length = strlen(str);
 	new_string->ref_count = 1;
+	new_string->_hash_index = index;
 	return new_string;
 }
 
@@ -61,8 +56,7 @@ String* string_new(StringPool* pool, const char* str) {
 
 	// =========================================
 	// Else Allocate memory for the new string
-	String* new_string = string_alloc(str);
-	new_string->_hash_index = index;
+	String* new_string = string_next(pool->string_page, str, index);
 
 	// =========================================
 	// Insert in the hash table at the head

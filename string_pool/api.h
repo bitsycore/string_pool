@@ -35,6 +35,7 @@
 #define S_SCOPE_NEW(str) scope_context_add_string(__SCOPE_CONTEXT__, S_NEW(str))
 #define S_SCOPE_REPLACE(original, target, replacement) scope_context_add_string(__SCOPE_CONTEXT__, S_REPLACE(original, target, replacement))
 #define S_SCOPE_CONTEXT __SCOPE_CONTEXT__
+
 // =====================================================================================================================
 // MARK: StringBuilder API
 // =====================================================================================================================

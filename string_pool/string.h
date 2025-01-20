@@ -12,6 +12,12 @@
 void string_free(String* ps);
 
 /**
+ * Allocate memory for a new empty String
+ * @return Pointer to the new String
+ */
+String* string_empty_alloc();
+
+/**
  * Allocate memory for a new String
  * @param str The string to be duplicated
  * @return Pointer to the new String

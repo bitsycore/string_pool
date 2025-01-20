@@ -22,6 +22,8 @@ add_library(
         common/maths.h
         string_pool/scope_context.c
         string_pool/scope_context.h
+        string_pool/string_page.c
+        string_pool/string_page.h
 )
 
 add_executable(testStringPool main.c)

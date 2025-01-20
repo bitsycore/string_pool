@@ -8,7 +8,7 @@
 typedef struct ScopeContext ScopeContext;
 
 struct ScopeContext {
-	String* string_array[64];
+	String* string_array[SCOPE_CONTEXT_SIZE];
 	size_t count;
 	ScopeContext* next;
 };

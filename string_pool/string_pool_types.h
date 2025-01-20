@@ -9,6 +9,7 @@ typedef struct String String;
 typedef struct StringPool StringPool;
 typedef struct StringBuilder StringBuilder;
 typedef struct StringBuilderNode StringBuilderNode;
+typedef struct StringPage StringPage;
 
 struct String {
 	char* str;
@@ -18,7 +19,14 @@ struct String {
 	size_t _hash_index;
 };
 
+struct StringPage {
+	String strings[STRING_PAGE_SIZE];
+	size_t count;
+	StringPage* next;
+};
+
 struct StringPool {
+	StringPage* string_page;
 	String* hash_table[HASH_TABLE_SIZE];
 	size_t count;
 };

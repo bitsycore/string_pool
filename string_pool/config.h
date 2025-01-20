@@ -12,7 +12,9 @@
 // ====================
 // MARK: CONFIG
 #define HASH_FUNCTION HASH_OPT_FNV1A
-#define HASH_TABLE_SIZE 16381 // Prime number 8191, 16381, or 32749
+#define HASH_TABLE_SIZE 8191 // Prime number 8191, 16381, or 32749
+#define SCOPE_CONTEXT_SIZE 64
+#define STRING_PAGE_SIZE 128
 
 // ====================
 // SELECTOR

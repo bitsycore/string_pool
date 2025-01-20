@@ -23,7 +23,7 @@ String* scope_context_add_string(ScopeContext* context, String* string) {
 		return NULL;
 	}
 
-	while (context->count >= 64) {
+	while (context->count >= SCOPE_CONTEXT_SIZE) {
 		if (context->next) {
 			context = context->next;
 		} else {

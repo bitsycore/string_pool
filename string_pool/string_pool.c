@@ -8,6 +8,7 @@
 
 #include "global_pool.h"
 #include "string.h"
+#include "string_page.h"
 
 // =====================================================================================================================
 // MARK: STRING POOL
@@ -67,6 +68,8 @@ StringPool* string_pool_new() {
 		EXIT_ERROR("Failed to allocate String Pool");
 
 	pool->count = 0;
+
+	pool->string_page = string_page_alloc();
 
 	for (size_t i = 0; i < HASH_TABLE_SIZE; i++) {
 		pool->hash_table[i] = NULL;
