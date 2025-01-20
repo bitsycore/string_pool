@@ -41,7 +41,6 @@ static StringBuilderNode* string_builder_node_new_string(String* string) {
 	StringBuilderNode* node = malloc(sizeof(StringBuilderNode));
 	if (!node)
 		EXIT_ERROR("Failed to allocate StringBuilderNode");
-	string->ref_count++;
 	node->type = STRING_BUILDER_NODE_TYPE_STRING;
 	node->string = string;
 	node->next = NULL;
@@ -85,7 +84,7 @@ void string_builder_append_format(StringBuilder* builder, const char* format, ..
 	va_list args;
 	va_start(args, format);
 
-	// Estimate buffer size, assume at least 128 char
+	// Estimate buffer size
 	const int size = vsnprintf(NULL, 0, format, args);
 	va_end(args);
 

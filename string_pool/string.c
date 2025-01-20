@@ -62,10 +62,11 @@ String* string_new(StringPool* pool, const char* str) {
 	// =========================================
 	// Else Allocate memory for the new string
 	String* new_string = string_alloc(str);
+	new_string->_hash_index = index;
 
 	// =========================================
 	// Insert in the hash table at the head
-	new_string->__next = pool->hash_table[index];
+	new_string->_next = pool->hash_table[index];
 	pool->hash_table[index] = new_string;
 	pool->count++;
 
@@ -92,21 +93,21 @@ void string_release(StringPool* pool, String** out_ptr_string) {
 	if (ptr_string->ref_count > 1) {
 		ptr_string->ref_count--;
 	} else {
-		const size_t index = hash(ptr_string->str, HASH_TABLE_SIZE);
-		String* current = pool->hash_table[index];
+		ptr_string->ref_count--;
+		String* current = pool->hash_table[ptr_string->_hash_index];
 		String* prev = NULL;
 
 		while (current) {
 			if (current == ptr_string) {
-				if (prev) prev->__next = current->__next;
-				else pool->hash_table[index] = current->__next;
-				current->__next = NULL;
+				if (prev) prev->_next = current->_next;
+				else pool->hash_table[current->_hash_index] = current->_next;
+				current->_next = NULL;
 				string_free(current);
 				pool->count--;
 				break;
 			}
 			prev = current;
-			current = current->__next;
+			current = current->_next;
 		}
 	}
 

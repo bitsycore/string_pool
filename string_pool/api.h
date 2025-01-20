@@ -30,9 +30,9 @@
 #define S_REPLACE(original, target, replacement) string_replace(NULL, original, target, replacement)
 #define S_REPLACE_STR(original, target, replacement) string_replace_str(NULL, original, target, replacement)
 
-#define S_SCOPE_START { ScopeContext* __SCOPE_CONTEXT__ = scope_context_new();
-#define S_SCOPE_END scope_context_free(__SCOPE_CONTEXT__); }
-#define S_SCOPE_NEW(str) scope_context_add_string(__SCOPE_CONTEXT__,S_NEW(str));
+#define S_SCOPE_START() { ScopeContext* __SCOPE_CONTEXT__ = scope_context_new()
+#define S_SCOPE_END() scope_context_free(__SCOPE_CONTEXT__); } NULL
+#define S_SCOPE_NEW(str) scope_context_add_string(__SCOPE_CONTEXT__,S_NEW(str))
 
 // =====================================================================================================================
 // MARK: StringBuilder API

@@ -19,37 +19,38 @@ ScopeContext* scope_context_new() {
 }
 
 String* scope_context_add_string(ScopeContext* context, String* string) {
-	// NOLINT(*-no-recursion)
 	if (!context || !string) {
 		return NULL;
 	}
 
-	if (context->count >= 64) {
-		context->next = scope_context_new();
-		context = context->next;
+	while (context->count >= 64) {
+		if (context->next) {
+			context = context->next;
+		} else {
+			context->next = scope_context_new();
+			context = context->next;
+		}
 	}
 
-	context->strings[context->count++] = string;
+	context->string_array[context->count++] = string;
 
 	return string;
 }
 
-void scope_context_free(ScopeContext* context) {
-	// NOLINT(*-no-recursion)
+
+void scope_context_free(ScopeContext* context) { // NOLINT(*-no-recursion)
 	if (!context) {
 		return;
 	}
 
 	for (size_t i = 0; i < context->count; ++i) {
-		String* node = context->strings[i];
+		String* node = context->string_array[i];
 		if (node) {
 			string_release(NULL, &node);
 		}
 	}
 
-	if (context->next) {
-		scope_context_free(context->next);
-	}
+	scope_context_free(context->next);
 
 	free(context);
 }
