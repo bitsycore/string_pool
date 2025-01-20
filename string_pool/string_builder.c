@@ -43,6 +43,7 @@ static StringBuilderNode* string_builder_node_new_string(String* string) {
 		EXIT_ERROR("Failed to allocate StringBuilderNode");
 	node->type = STRING_BUILDER_NODE_TYPE_STRING;
 	node->string = string;
+	string->ref_count++;
 	node->next = NULL;
 	return node;
 }
@@ -160,7 +161,6 @@ String* string_builder_to_string(StringBuilder* builder) {
 			strcat(result, nodes[j]->str);
 		else if (nodes[j]->type == STRING_BUILDER_NODE_TYPE_STRING) {
 			strcat(result, nodes[j]->string->str);
-			string_release(NULL, &nodes[j]->string);
 		}
 	}
 

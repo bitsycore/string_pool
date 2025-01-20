@@ -2,6 +2,54 @@
 
 #include "string_pool/api.h"
 
+void builder_test_1(ScopeContext * S_SCOPE_CONTEXT) {
+    String *ps2 = S_SCOPE_NEW("Hello");
+
+    String *final_string = SB_START()
+
+        const int age = 30;
+        SB_APPEND(ps2);
+        SB_APPEND_STR(" --- ");
+        SB_APPEND_STR("Name: ");
+        SB_APPEND_FORMAT("%s, ", "John");
+        SB_APPEND_STR("Age: ");
+        SB_APPEND_INT(age);
+
+    SB_END(final_string);
+    puts(final_string->str);
+    S_RELEASE(final_string);
+}
+
+void builder_test_2(ScopeContext * S_SCOPE_CONTEXT) {
+    String *abc = SB_START()
+        String *test = S_SCOPE_NEW("Test replace NEW, and the NEW");
+        String *replaced = S_SCOPE_REPLACE(test, "NEW", "Hi");
+        const int age = 11;
+        SB_APPEND_STR(" ");
+        SB_APPEND(replaced);
+        SB_APPEND_STR("Name: ");
+        SB_APPEND_FORMAT("%s, ", "BOB");
+        SB_APPEND_STR("Age: ");
+        SB_APPEND_FORMAT("%d", age);
+    SB_END(abc);
+
+    puts(abc->str);
+    S_RELEASE(abc);
+}
+
+bool string_cmp_test(String *ps1, String *ps2, String *ps3) {
+    if (!S_CMP(ps1, ps2)) {
+        return false;
+    }
+    printf("STRING_CMP: work.\n");
+
+    if (S_CMP_VA(ps3, ps2, ps1)) {
+        return false;
+    }
+    printf("STRING_CMP_VA: work.\n");
+    return true;
+}
+
 int main() {
     S_SCOPE_START();
 
@@ -11,13 +59,8 @@ int main() {
 
         // ===============================================
         // STRING_CMP & STRING_CMP_VA test
-        if (!S_CMP(ps1, ps2))
-            return -1;
-        printf("STRING_CMP: work.\n");
-
-        if (S_CMP_VA(ps3, ps2, ps1))
-            return -1;
-        printf("STRING_CMP_VA: work.\n");
+        if (string_cmp_test(ps1, ps2, ps3))
+            printf("Error in string_cmp_test\n");
 
 
         // ===============================================
@@ -33,60 +76,33 @@ int main() {
         // Lots of init test
         for (int j = 0; j < 100; j++) {
             S_SCOPE_START();
-            String *str_test = SB_START()
-                for (int i = 0; i < 100; i++) {
-                    char buffer[10 + 20];
-                    snprintf(buffer, sizeof(buffer), i % 2 == 0 ? "%d-WORLD" : "%d-HELLO", j * 100 + i);
-                    const String *string = S_SCOPE_NEW(buffer);
-                    SB_APPEND_FORMAT(
-                        "String: %s (ptr: %p, ref_count: %zu)\n",
-                        string->str,
-                        (void *) string->str,
-                        string->ref_count
-                    );
-                }
-            SB_END(str_test);
-            puts(str_test->str);
-            S_RELEASE(str_test);
+                String *str_test = SB_START()
+                    for (int i = 0; i < 100; i++) {
+                        char buffer[10 + 20];
+                        snprintf(buffer, sizeof(buffer), i % 2 == 0 ? "%d-WORLD" : "%d-HELLO", j * 100 + i);
+                        const String *string = S_SCOPE_NEW(buffer);
+                        SB_APPEND_FORMAT(
+                            "String: %s (ptr: %p, ref_count: %zu)\n",
+                            string->str,
+                            (void *) string->str,
+                            string->ref_count
+                        );
+                    }
+                SB_END(str_test);
+                puts(str_test->str);
+                S_RELEASE(str_test);
             S_SCOPE_END();
         }
+
         // ===============================================
         // BUILDER TEST
-        // String* final_string = SB_START()
-        //
-        // 	const int age = 30;
-        // 	SB_APPEND(ps2);
-        // 	SB_APPEND_STR(" --- ");
-        // 	SB_APPEND_STR("Name: ");
-        // 	SB_APPEND_FORMAT("%s, ", "John");
-        // 	SB_APPEND_STR("Age: ");
-        // 	SB_APPEND_INT(age);
-        //
-        // SB_END(final_string);
-        //
-        // puts(final_string->str);
-        // S_RELEASE(final_string);
-
-        // String* abc = SB_START()
-        //
-        // 	String* test = S_SCOPE_NEW("Test replace NEW, and the NEW");
-        // 	String* replaced = S_REPLACE(test, "NEW", "Hi");
-        // 	const int age = 11;
-        // 	SB_APPEND_STR(" ");
-        // 	SB_APPEND_STR("Name: ");
-        // 	SB_APPEND_FORMAT("%s, ", "BOB");
-        // 	SB_APPEND_STR("Age: ");
-        // 	SB_APPEND_FORMAT("%d", age);
-        // 	S_RELEASE(replaced);
-        // SB_END(abc);
-        //
-        // puts(abc->str);
-        // S_RELEASE(abc);
+        builder_test_1(S_SCOPE_CONTEXT);
+        builder_test_2(S_SCOPE_CONTEXT);
 
     S_SCOPE_END();
 
     // ===============================================
     // Release Pool and Quit
-    SP_FREE();
+    SP_GLOBAL_FREE();
     return 0;
 }

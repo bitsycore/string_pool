@@ -12,7 +12,7 @@
 // MARK: StringPool API
 // =====================================================================================================================
 
-#define SP_FREE() deinit_global_pool();
+#define SP_GLOBAL_FREE() deinit_global_pool();
 #define SP_COUNT_STR() get_global_pool_singleton()->count
 #define SP_COUNT_REF() string_pool_count_ref(NULL)
 #define SP_GET_STRING(string) string_pool_get_string(NULL, string);
@@ -33,7 +33,8 @@
 #define S_SCOPE_START() { ScopeContext* __SCOPE_CONTEXT__ = scope_context_new()
 #define S_SCOPE_END() scope_context_free(&__SCOPE_CONTEXT__); } NULL
 #define S_SCOPE_NEW(str) scope_context_add_string(__SCOPE_CONTEXT__, S_NEW(str))
-
+#define S_SCOPE_REPLACE(original, target, replacement) scope_context_add_string(__SCOPE_CONTEXT__, S_REPLACE(original, target, replacement))
+#define S_SCOPE_CONTEXT __SCOPE_CONTEXT__
 // =====================================================================================================================
 // MARK: StringBuilder API
 // =====================================================================================================================
