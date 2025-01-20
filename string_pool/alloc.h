@@ -14,7 +14,9 @@
 #define sp_strdup(str) strdup(str);sp_alloc_plus()
 
 void sp_alloc_plus();
+
 void sp_alloc_minus();
+
 size_t sp_alloc_get();
 
 #endif //ALLOC_H

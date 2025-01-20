@@ -11,7 +11,7 @@
 #include "string_pool_types.h"
 
 StringPage *string_page_alloc() {
-    StringPage *string_page = sp_malloc(sizeof(StringPage));
+    StringPage* string_page = sp_malloc(sizeof(StringPage));
     string_page->count = 0;
     string_page->next = NULL;
 
