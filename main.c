@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "string_pool/alloc.h"
 #include "string_pool/api.h"
 
 void builder_test_1(ScopeContext * S_SCOPE_CONTEXT) {
@@ -104,5 +105,6 @@ int main() {
     // ===============================================
     // Release Pool and Quit
     SP_GLOBAL_FREE();
+    printf("YOU HAVE NO FREED %llu", sp_alloc_get());
     return 0;
 }

@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "alloc.h"
 #include "config.h"
 #include "global_pool.h"
 #include "string_page.h"
@@ -21,12 +22,12 @@
 // =========================================
 
 void string_free(String* ps) {
-	free(ps->str);
+	sp_free(ps->str);
 }
 
 String* string_next(StringPage * string_page, const char * str, size_t index) {
 	String* new_string = string_page_next_string(string_page);
-	new_string->str = strdup(str);
+	new_string->str = sp_strdup(str);
 	new_string->length = strlen(str);
 	new_string->ref_count = 1;
 	new_string->_hash_index = index;
@@ -133,7 +134,7 @@ static char* internal_string_replace_str(const char* original_str, const size_t 
                                          const size_t replacement_len) {
 	size_t result_len = 0;
 	size_t alloc_len = original_str_int + 1;
-	char* result_str = malloc(alloc_len);
+	char* result_str = sp_malloc(alloc_len);
 	if (!result_str)
 		EXIT_ERROR("Failed to allocate memory for replace result string");
 
@@ -145,9 +146,9 @@ static char* internal_string_replace_str(const char* original_str, const size_t 
 
 		if (result_len + prefix_len + replacement_len >= alloc_len) {
 			alloc_len *= 2;
-			char* temp_ptr = realloc(result_str, alloc_len);
+			char* temp_ptr = sp_realloc(result_str, alloc_len);
 			if (!temp_ptr) {
-				free(result_str);
+				sp_free(result_str);
 				EXIT_ERROR("Failed to reallocate memory for replace result string");
 			}
 			result_str = temp_ptr;
@@ -164,9 +165,9 @@ static char* internal_string_replace_str(const char* original_str, const size_t 
 	const size_t remaining_len = strlen(current_ptr);
 	if (result_len + remaining_len >= alloc_len) {
 		alloc_len = result_len + remaining_len + 1;
-		char* temp_ptr = realloc(result_str, alloc_len);
+		char* temp_ptr = sp_realloc(result_str, alloc_len);
 		if (!temp_ptr) {
-			free(result_str);
+			sp_free(result_str);
 			EXIT_ERROR("Failed to reallocate memory for replace result string");
 		}
 		result_str = temp_ptr;
@@ -205,7 +206,7 @@ String* string_replace(StringPool* pool, const String* original, const char* tar
 		strlen(replacement)
 	);
 	String* result = string_new(pool, result_str);
-	free((void*) result_str);
+	sp_free((void*) result_str);
 
 	return result;
 }

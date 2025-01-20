@@ -24,6 +24,8 @@ add_library(
         string_pool/scope_context.h
         string_pool/string_page.c
         string_pool/string_page.h
+        string_pool/alloc.h
+        string_pool/alloc.c
 )
 
 add_executable(testStringPool main.c)

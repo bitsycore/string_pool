@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "alloc.h"
 #include "global_pool.h"
 #include "string.h"
 #include "string_page.h"
@@ -63,7 +64,7 @@ size_t string_pool_count_ref(StringPool* pool) {
 }
 
 StringPool* string_pool_new() {
-	StringPool* pool = malloc(sizeof(StringPool));
+	StringPool* pool = sp_malloc(sizeof(StringPool));
 	if (!pool)
 		EXIT_ERROR("Failed to allocate String Pool");
 
@@ -97,6 +98,8 @@ void string_pool_free(StringPool** in_pool) {
 		}
 	}
 
+	string_page_free(pool->string_page);
+
 	// ===============================================
 	// Print Warning if there are unreleased strings
 	if (unreleased_count_ref > 0 || unreleased_count_string > 0) {
@@ -111,6 +114,6 @@ void string_pool_free(StringPool** in_pool) {
 		WARN(buffer);
 	}
 
-	free(pool);
+	sp_free(pool);
 	*in_pool = NULL;
 }

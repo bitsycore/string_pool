@@ -2,6 +2,7 @@
 #define STRING_POOL_TYPES_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 #include "config.h"
 
