@@ -35,7 +35,6 @@ void string_builder_append_str(StringBuilder* builder, const char* str);
  */
 void string_builder_append_format(StringBuilder* builder, const char* format, ...);
 
-
 /**
  * Create a new String from the StringBuilder using the string pool
  * @param builder Pointer to the StringBuilder

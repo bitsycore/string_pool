@@ -17,7 +17,7 @@ ScopeContext* scope_context_new();
 
 String* scope_context_add_string(ScopeContext* context, String* string);
 
-void scope_context_free(ScopeContext* context);
+void scope_context_free(ScopeContext** context);
 
 
 #endif //SCOPE_SCONTEXT_H

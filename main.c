@@ -32,6 +32,7 @@ int main() {
         // ===============================================
         // Lots of init test
         for (int j = 0; j < 100; j++) {
+            S_SCOPE_START();
             String *str_test = SB_START()
                 for (int i = 0; i < 100; i++) {
                     char buffer[10 + 20];
@@ -47,6 +48,7 @@ int main() {
             SB_END(str_test);
             puts(str_test->str);
             S_RELEASE(str_test);
+            S_SCOPE_END();
         }
         // ===============================================
         // BUILDER TEST

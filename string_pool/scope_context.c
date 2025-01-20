@@ -38,19 +38,22 @@ String* scope_context_add_string(ScopeContext* context, String* string) {
 }
 
 
-void scope_context_free(ScopeContext* context) { // NOLINT(*-no-recursion)
-	if (!context) {
+void scope_context_free(ScopeContext** context) { // NOLINT(*-no-recursion)
+	if (!context || !*context) {
 		return;
 	}
 
-	for (size_t i = 0; i < context->count; ++i) {
-		String* node = context->string_array[i];
+	ScopeContext* in_context = *context;
+
+	for (size_t i = 0; i < in_context->count; ++i) {
+		String* node = in_context->string_array[i];
 		if (node) {
 			string_release(NULL, &node);
 		}
 	}
 
-	scope_context_free(context->next);
+	scope_context_free(&in_context->next);
 
-	free(context);
+	free(*context);
+	context = NULL;
 }
