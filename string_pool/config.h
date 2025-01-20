@@ -10,6 +10,14 @@
 #define HASH_MURMUR3_32 5
 
 // ====================
+// MARK: CONFIG
+#define HASH_FUNCTION HASH_MURMUR3_32
+#define HASH_TABLE_SIZE 32749 // Prime number 8191, 16381, or 32749
+#define SCOPE_CONTEXT_SIZE 64
+#define STRING_PAGE_SIZE 128
+#define POOR_GRIND 1
+
+// ====================
 // SELECTOR
 #if HASH_FUNCTION == HASH_FNV1A
 #define hash(str, table_size) hash_fnv1a(str, table_size)
@@ -24,14 +32,5 @@
 #else
 #define hash(str, table_size) hash_djb2(str, table_size)
 #endif
-
-// ====================
-// MARK: CONFIG
-#define HASH_FUNCTION HASH_OPT_FNV1A
-#define HASH_TABLE_SIZE 8191 // Prime number 8191, 16381, or 32749
-#define SCOPE_CONTEXT_SIZE 64
-#define STRING_PAGE_SIZE 128
-#define POOR_GRIND 1
-
 
 #endif // CONFIG_H
