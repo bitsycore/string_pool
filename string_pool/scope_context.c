@@ -18,7 +18,8 @@ ScopeContext* scope_context_new() {
 	return context;
 }
 
-String* scope_context_add_string(ScopeContext* context, String* string) { // NOLINT(*-no-recursion)
+String* scope_context_add_string(ScopeContext* context, String* string) {
+	// NOLINT(*-no-recursion)
 	if (!context || !string) {
 		return NULL;
 	}
@@ -33,7 +34,8 @@ String* scope_context_add_string(ScopeContext* context, String* string) { // NOL
 	return string;
 }
 
-void scope_context_free(ScopeContext* context) { // NOLINT(*-no-recursion)
+void scope_context_free(ScopeContext* context) {
+	// NOLINT(*-no-recursion)
 	if (!context) {
 		return;
 	}
