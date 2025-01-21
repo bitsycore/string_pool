@@ -3,6 +3,10 @@ project(testStringPool C)
 
 set(CMAKE_C_STANDARD 99)
 
+# ==============================================================================
+# MARK: Test Project
+# ==============================================================================
+
 add_library(
         StringPool
         string_pool/string_pool.h
@@ -26,8 +30,18 @@ add_library(
         string_pool/string_page.h
         string_pool/alloc.h
         string_pool/alloc.c
+        common/debug.c
+        common/debug.h
 )
 
-add_executable(testStringPool main.c)
+if (WIN32)
+    # Dbghelp.lib for call stack
+    target_link_libraries(StringPool dbghelp)
+endif ()
 
+# ==============================================================================
+# MARK: Test Project
+# ==============================================================================
+
+add_executable(testStringPool main.c)
 target_link_libraries(testStringPool StringPool)
