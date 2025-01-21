@@ -189,7 +189,7 @@ void string_builder_release(StringBuilder** in_builder) {
 		if (temp->type == STRING_BUILDER_NODE_TYPE_STR) {
 			sp_free(temp->str);
 		} else if (temp->type == STRING_BUILDER_NODE_TYPE_STRING) {
-			string_release(builder->pool, &temp->string);
+			string_release(&temp->string);
 		}
 
 		sp_free(temp);

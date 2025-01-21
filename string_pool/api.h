@@ -22,7 +22,7 @@
 // =====================================================================================================================
 
 #define S_NEW(str) string_new(NULL, str)
-#define S_RELEASE(ptr) string_release(NULL, &ptr)
+#define S_RELEASE(ptr) string_release(&ptr)
 
 #define S_CMP(first, second) (first->str == second->str)
 #define S_CMP_VA(first, ...) string_cmp_va(first, __VA_ARGS__, NULL)

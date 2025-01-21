@@ -49,7 +49,7 @@ void scope_context_free(ScopeContext** context) { // NOLINT(*-no-recursion)
 	for (size_t i = 0; i < in_context->count; ++i) {
 		String* node = in_context->string_array[i];
 		if (node) {
-			string_release(NULL, &node);
+			string_release(&node);
 		}
 	}
 

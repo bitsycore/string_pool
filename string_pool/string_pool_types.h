@@ -16,8 +16,9 @@ struct String {
 	char* str;
 	size_t length;
 	size_t ref_count;
-	String* _next;
-	size_t _hash_index;
+	StringPool* pool;
+	String* next_collision;
+	size_t hash_index;
 };
 
 struct StringPage {

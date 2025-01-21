@@ -9,7 +9,7 @@
  * Free the memory allocated for the String
  * @param ps Pointer to the String
  */
-void string_free(String* ps);
+void string_free(const String* ps);
 
 /**
  * Allocate memory for a new empty String
@@ -35,10 +35,9 @@ String* string_new(StringPool* pool, const char* str);
 /**
  * Release a String from the pool if its reference count is zero, otherwise decrement the reference count.
  * The input pointer is set to NULL after the string is released.
- * @param pool Pointer to the StringPool
  * @param out_ptr_string Pointer to the String pointer
  */
-void string_release(StringPool* pool, String** out_ptr_string);
+void string_release(String** out_ptr_string);
 
 /**
  * Compare two strings

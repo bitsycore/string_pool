@@ -41,7 +41,7 @@ String* string_pool_get_string_with_index(StringPool* pool, const char* str, con
 			current->ref_count++;
 			return current;
 		}
-		current = current->_next;
+		current = current->next_collision;
 	}
 
 	return NULL;
@@ -57,7 +57,7 @@ size_t string_pool_count_ref(StringPool* pool) {
 		const String* current = pool->hash_table[i];
 		while (current) {
 			ref_count += current->ref_count;
-			current = current->_next;
+			current = current->next_collision;
 		}
 	}
 	return ref_count;
@@ -93,7 +93,7 @@ void string_pool_free(StringPool** in_pool) {
 		String* current = pool->hash_table[i];
 		while (current) {
 			String* temp = current;
-			current = current->_next;
+			current = current->next_collision;
 			string_free(temp);
 		}
 	}
