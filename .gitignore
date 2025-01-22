@@ -1,2 +1,12 @@
 /cmake-build-*/
 /.idea/
+/.cmake/
+/CMakeFiles/
+/Testing/
+/.ninja_deps
+/.ninja_log
+/build.ninja
+/cmake_install.cmake
+/CMakeCache.txt
+/libStringPool.a
+/testStringPool

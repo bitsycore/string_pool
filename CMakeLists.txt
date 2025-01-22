@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.20)
 project(testStringPool C)
 
 set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 # ==============================================================================
 # MARK: Test Project
@@ -37,6 +38,13 @@ add_library(
 if (WIN32)
     # Dbghelp.lib for call stack
     target_link_libraries(StringPool dbghelp)
+elseif (UNIX)
+#    find_library(DL_LIBRARY dl)
+#    if(DL_LIBRARY)
+#        target_link_libraries(StringPool ${DL_LIBRARY})
+#    else()
+#        message(WARNING "dl library not found.")
+#    endif()
 endif ()
 
 # ==============================================================================

@@ -1,6 +1,5 @@
 #include "debug.h"
 
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -82,64 +81,44 @@ char* print_call_stack() {
 #include <unistd.h>
 
 char* print_call_stack() {
-	void* buffer[100];
-	int nptrs = backtrace(buffer, 100);
-	char** symbols = backtrace_symbols(buffer, nptrs);
-	if (symbols == NULL) {
-		perror("backtrace_symbols");
-		exit(EXIT_FAILURE);
+	void* stack[100];
+	int frames = backtrace(stack, 100);
+	char** symbols = backtrace_symbols(stack, frames);
+
+	if (!symbols) {
+		return NULL; // backtrace_symbols failed
 	}
 
-	// Allocate initial buffer
 	size_t buffer_size = 1024;
-	char* result = malloc(buffer_size);
-	if (!result) {
+	char* buffer = (char*)malloc(buffer_size);
+	if (!buffer) {
 		free(symbols);
 		return NULL;
 	}
-	result[0] = '\0';
+	buffer[0] = '\0';
 
-	for (int i = 0; i < nptrs; i++) {
-		size_t needed = snprintf(NULL, 0, "%s\n", symbols[i]) + 1;
-		if (strlen(result) + needed >= buffer_size) {
+	for (int i = 0; i < frames; i++) {
+		size_t needed = snprintf(NULL, 0, "  %d: %s\n", frames - i - 1, symbols[i]) + 1;
+		if (strlen(buffer) + needed >= buffer_size) {
 			buffer_size *= 2;
-			char* temp = realloc(result, buffer_size);
+			char* temp = (char*)realloc(buffer, buffer_size);
 			if (!temp) {
 				free(symbols);
-				free(result);
+				free(buffer);
 				return NULL;
 			}
-			result = temp;
+			buffer = temp;
 		}
-		snprintf(result + strlen(result), buffer_size - strlen(result), "%s\n", symbols[i]);
-
-		char command[256];
-		snprintf(command, sizeof(command), "addr2line -e %s %p", program_invocation_name, buffer[i]);
-		FILE* fp = popen(command, "r");
-		if (fp) {
-			char addr2line_output[256];
-			while (fgets(addr2line_output, sizeof(addr2line_output), fp)) {
-				needed = strlen(addr2line_output) + 1;
-				if (strlen(result) + needed >= buffer_size) {
-					buffer_size *= 2;
-					char* temp = realloc(result, buffer_size);
-					if (!temp) {
-						free(symbols);
-						free(result);
-						pclose(fp);
-						return NULL;
-					}
-					result = temp;
-				}
-				strcat(result, addr2line_output);
-			}
-			pclose(fp);
-		}
+		snprintf(buffer + strlen(buffer), buffer_size - strlen(buffer), "  %d: %s\n", frames - i - 1, symbols[i]);
 	}
 
 	free(symbols);
-	return result;
+	return buffer;
 }
+
+#ifdef CLEAN_GNU
+#undef __USE_GNU
+#endif
 
 // =====================================================================================================================
 #endif
