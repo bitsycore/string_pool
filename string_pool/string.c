@@ -25,7 +25,7 @@ void string_free(const String* ps) {
 	sp_free(ps->str);
 }
 
-String* string_next(StringPage* string_page, const char* str, size_t index) {
+String* string_next(StringPage* string_page, const char* str, const size_t index) {
 	String* new_string = string_page_next_string(string_page);
 	new_string->str = sp_strdup(str);
 	new_string->length = strlen(str);
@@ -138,7 +138,7 @@ static const char* internal_string_replace_str(
 	const char* replacement,
 	const size_t replacement_len
 ) {
-	if (!original_str || !target || !replacement || target_len == 0) {
+	if (!original_str || target_len == 0) {
 		return NULL;
 	}
 

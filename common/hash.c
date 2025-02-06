@@ -43,7 +43,7 @@ uint32_t hash_fnv1a_optimized(const char* str, const uint32_t table_size, const 
 uint32_t hash_djb2(const char* str, const uint32_t table_size) {
 	uint32_t hash_value = 5381;
 	while (*str) {
-		hash_value = ((hash_value << 5) + hash_value) + *str++; // hash * 33 + char
+		hash_value = (hash_value << 5) + hash_value + *str++; // hash * 33 + char
 	}
 	return hash_value % table_size;
 }
@@ -70,7 +70,7 @@ uint32_t hash_murmur3_32(const char* str, const uint32_t table_size) {
 	const uint32_t nb_blocks = len / 4;
 
 	// Process full 4-byte chunks
-	const uint32_t* blocks = (const uint32_t*) (data);
+	const uint32_t* blocks = (const uint32_t*) data;
 	for (int i = 0; i < nb_blocks; i++) {
 		uint32_t k = blocks[i];
 		k *= c1;
@@ -78,7 +78,7 @@ uint32_t hash_murmur3_32(const char* str, const uint32_t table_size) {
 		k *= c2;
 
 		hash ^= k;
-		hash = (hash << r2) | (hash >> (32 - r2));
+		hash = hash << r2 | hash >> 32 - r2;
 		hash = hash * m + n;
 	}
 
@@ -88,7 +88,7 @@ uint32_t hash_murmur3_32(const char* str, const uint32_t table_size) {
 	switch (len & 3) {
 		case 3: k ^= (uint32_t) (tail[2] << 16);
 		case 2: k ^= (uint32_t) (tail[1] << 8);
-		case 1: k ^= (uint32_t) (tail[0]);
+		case 1: k ^= (uint32_t) tail[0];
 			k *= c1;
 			k = k << r1 | k >> 32 - r1;
 			k *= c2;

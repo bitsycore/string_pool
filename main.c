@@ -24,7 +24,7 @@ void builder_test_1(ScopeContext* S_SCOPE_CONTEXT) {
 
 void builder_test_2(ScopeContext* S_SCOPE_CONTEXT) {
 	SB(abc, {
-	   String* test = S_SCOPE_NEW("Test replace NEW, and the NEW");
+	   const String* test = S_SCOPE_NEW("Test replace NEW, and the NEW");
 	   String* replaced = S_SCOPE_REPLACE(test, "NEW", "");
 
 	   if (test->length <= replaced->length)
@@ -44,7 +44,7 @@ void builder_test_2(ScopeContext* S_SCOPE_CONTEXT) {
 	S_RELEASE(abc);
 }
 
-void string_cmp_test(String* ps1, String* ps2, String* ps3) {
+void string_cmp_test(const String* ps1, const String* ps2, const String* ps3) {
 	if (!S_CMP(ps1, ps2)) {
 		printf("Error S_CMP\n");
 	} else {
@@ -84,8 +84,8 @@ void loops_and_multi_scope_test(ScopeContext* S_SCOPE_CONTEXT) {
 	}
 }
 
-bool string_find_test(String* ps1) {
-	String* ps1_eq = SP_GET_STRING("Hello");
+bool string_find_test(const String* ps1) {
+	const String* ps1_eq = SP_GET_STRING("Hello");
 
 	if (!S_CMP(ps1, ps1_eq))
 		return false;
@@ -97,8 +97,8 @@ bool string_find_test(String* ps1) {
 
 int main() {
 	ScopeContext* context = scope_context_new();
-	String* contextedString = scope_context_add_string(context, S_NEW("Hello"));
-	puts(contextedString->str);
+	const String* string_in_context = scope_context_add_string(context, S_NEW("Hello"));
+	puts(string_in_context->str);
 
 	String* test = S_NEW("Hello");
 	String* test2 = S_NEW("Hello");
@@ -106,10 +106,9 @@ int main() {
 	S_RELEASE(test2);
 
 	S_SCOPE({
-
-		String* ps1 = S_SCOPE_NEW("Hello");
-		String* ps2 = S_SCOPE_NEW("Hello");
-		String* ps3 = S_SCOPE_NEW("Hell_0");
+		const String* ps1 = S_SCOPE_NEW("Hello");
+		const String* ps2 = S_SCOPE_NEW("Hello");
+		const String* ps3 = S_SCOPE_NEW("Hell_0");
 
 		// ===============================================
 		// STRING_CMP & STRING_CMP_VA test

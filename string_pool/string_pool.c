@@ -90,9 +90,9 @@ void string_pool_free(StringPool** in_pool) {
 	const size_t unreleased_count_string = pool->count;
 
 	for (size_t i = 0; i < HASH_TABLE_SIZE; i++) {
-		String* current = pool->hash_table[i];
+		const String* current = pool->hash_table[i];
 		while (current) {
-			String* temp = current;
+			const String* temp = current;
 			current = current->next_collision;
 			string_free(temp);
 		}
