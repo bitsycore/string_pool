@@ -115,17 +115,17 @@ void sp_print_memory_leaks() {
 	printf("\n--------------------- [MEMORY LEAK DETECTED] ---------------------\n\n");
 	while (current != NULL) {
 		if ((double) current->size >= 1024 * 1024 * 2.5) {
-			printf("[%llu]\t0x%p\t%.2f MB\t%s:%d\n",
+			printf("[%zu]\t0x%p\t%.2f MB\t%s:%d\n",
 			       number_leaked_block, current->address,
 			       (double) current->size / (1024 * 1024),
 			       current->file, current->line);
 		} else if ((double) current->size >= 1024 * 2.5) {
-			printf("[%llu]\t0x%p\t%.2f KB\t%s:%d\n",
+			printf("[%zu]\t0x%p\t%.2f KB\t%s:%d\n",
 			       number_leaked_block, current->address,
 			       (double) current->size / 1024,
 			       current->file, current->line);
 		} else {
-			printf("[%llu]\t0x%p\t%zu Bytes\t%s:%d\n",
+			printf("[%zu]\t0x%p\t%zu Bytes\t%s:%d\n",
 			       number_leaked_block, current->address,
 			       current->size,
 			       current->file, current->line);
@@ -135,7 +135,7 @@ void sp_print_memory_leaks() {
 		number_leaked_block++;
 	}
 	printf(
-		"\n------------------------------------------------------------------\nBlocks: %llu\t%zu bytes (%.2f KB, %.2f MB)\n------------------------------------------------------------------\n",
+		"\n------------------------------------------------------------------\nBlocks: %lu\t%zu bytes (%.2f KB, %.2f MB)\n------------------------------------------------------------------\n",
 		number_leaked_block, total_leaked_memory, (double) total_leaked_memory / 1024.0,
 		(double) total_leaked_memory / (1024.0 * 1024.0));
 }
