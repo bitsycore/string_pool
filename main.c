@@ -8,22 +8,22 @@ void builder_test_1(ScopeContext* S_SCOPE_CONTEXT) {
 	String* ps2 = S_SCOPE_NEW("Hello");
 	SB(final_string, {
 
-		const int age = 30;
-		SB_APPEND(ps2);
-		SB_APPEND_STR(" --- ");
-		SB_APPEND_STR("Name: ");
-		SB_APPEND_FORMAT("%s, ", "John");
-		SB_APPEND_STR("Age: ");
-		SB_APPEND_INT(age);
+	   const int age = 30;
+	   SB_APPEND(ps2);
+	   SB_APPEND_STR(" --- ");
+	   SB_APPEND_STR("Name: ");
+	   SB_APPEND_FORMAT("%s, ", "John");
+	   SB_APPEND_STR("Age: ");
+	   SB_APPEND_INT(age);
 
-	});
+	   });
 
 	puts(final_string->str);
 	S_RELEASE(final_string);
 }
 
 void builder_test_2(ScopeContext* S_SCOPE_CONTEXT) {
-	SB(abc,{
+	SB(abc, {
 	   String* test = S_SCOPE_NEW("Test replace NEW, and the NEW");
 	   String* replaced = S_SCOPE_REPLACE(test, "NEW", "");
 
@@ -58,29 +58,29 @@ void string_cmp_test(String* ps1, String* ps2, String* ps3) {
 	}
 }
 
-void loops_and_multiscope_test(ScopeContext* S_SCOPE_CONTEXT) {
+void loops_and_multi_scope_test(ScopeContext* S_SCOPE_CONTEXT) {
 	String* test = S_SCOPE_NEW("Test");
 	for (int j = 0; j < 100; j++) {
 		S_SCOPE({
 			SB(str_test, {
 				for (int i = 0; i < 100; i++) {
-					char buffer[10 + 20];
-					snprintf(buffer, sizeof(buffer), i % 2 == 0 ? "%d-WORLD" : "%d-HELLO", j * 100 + i);
-					const String* string = S_SCOPE_NEW(buffer);
-					SB_APPEND_FORMAT(
-						"String: %s (ptr: %p, ref_count: %zu)\n",
-						string->str,
-						(void *) string->str,
-						string->ref_count
-					);
+				char buffer[10 + 20];
+				snprintf(buffer, sizeof(buffer), i % 2 == 0 ? "%d-WORLD" : "%d-HELLO", j * 100 + i);
+				const String* string = S_SCOPE_NEW(buffer);
+				SB_APPEND_FORMAT(
+					"String: %s (ptr: %p, ref_count: %zu)\n",
+					string->str,
+					(void *) string->str,
+					string->ref_count
+				);
 				}
 				SB_APPEND(test);
 				SB_APPEND_INT(5);
 				SB_APPEND_INT(test);
-			});
+				});
 			puts(str_test->str);
 			S_RELEASE(str_test);
-		});
+			});
 	}
 }
 
@@ -121,14 +121,14 @@ int main() {
 
 		// ===============================================
 		// Lots of init test
-		loops_and_multiscope_test(S_SCOPE_CONTEXT);
+		loops_and_multi_scope_test(S_SCOPE_CONTEXT);
 
 		// ===============================================
 		// BUILDER TEST
 		builder_test_1(S_SCOPE_CONTEXT);
 		builder_test_2(S_SCOPE_CONTEXT);
 
-	})
+		})
 
 	scope_context_free(&context);
 
