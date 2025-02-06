@@ -1,12 +1,12 @@
 #include <stdio.h>
 
 #include "common/error_handling.h"
-#include "string_pool/alloc.h"
+#include "common/alloc.h"
 #include "string_pool/api.h"
 
 void builder_test_1(ScopeContext* S_SCOPE_CONTEXT) {
 	String* ps2 = S_SCOPE_NEW("Hello");
-	String* final_string = SB_START()
+	SB(final_string, {
 
 		const int age = 30;
 		SB_APPEND(ps2);
@@ -16,32 +16,32 @@ void builder_test_1(ScopeContext* S_SCOPE_CONTEXT) {
 		SB_APPEND_STR("Age: ");
 		SB_APPEND_INT(age);
 
-	SB_END(final_string);
+	});
+
 	puts(final_string->str);
 	S_RELEASE(final_string);
 }
 
 void builder_test_2(ScopeContext* S_SCOPE_CONTEXT) {
-	String* abc = SB_START()
+	SB(abc,{
+	   String* test = S_SCOPE_NEW("Test replace NEW, and the NEW");
+	   String* replaced = S_SCOPE_REPLACE(test, "NEW", "");
 
-		String* test = S_SCOPE_NEW("Test replace NEW, and the NEW");
-		String* replaced = S_SCOPE_REPLACE(test, "NEW", "");
+	   if (test->length <= replaced->length)
+	   EXIT_ERROR("Error in string_replace");
 
-		if (test->length <= replaced->length)
-			EXIT_ERROR("Error in string_replace");
+	   const int age = 11;
+	   SB_APPEND_STR(" ");
+	   SB_APPEND(replaced);
+	   SB_APPEND_STR("Name: ");
+	   SB_APPEND_FORMAT("%s, ", "BOB");
+	   SB_APPEND_STR("Age: ");
+	   SB_APPEND_FORMAT("%d", age);
 
-		const int age = 11;
-		SB_APPEND_STR(" ");
-		SB_APPEND(replaced);
-		SB_APPEND_STR("Name: ");
-		SB_APPEND_FORMAT("%s, ", "BOB");
-		SB_APPEND_STR("Age: ");
-		SB_APPEND_FORMAT("%d", age);
-
-	SB_END(abc);
+	   });
 
 	puts(abc->str);
-	//S_RELEASE(abc);
+	S_RELEASE(abc);
 }
 
 void string_cmp_test(String* ps1, String* ps2, String* ps3) {
@@ -61,8 +61,8 @@ void string_cmp_test(String* ps1, String* ps2, String* ps3) {
 void loops_and_multiscope_test(ScopeContext* S_SCOPE_CONTEXT) {
 	String* test = S_SCOPE_NEW("Test");
 	for (int j = 0; j < 100; j++) {
-		S_SCOPE_START();
-			String* str_test = SB_START()
+		S_SCOPE({
+			SB(str_test, {
 				for (int i = 0; i < 100; i++) {
 					char buffer[10 + 20];
 					snprintf(buffer, sizeof(buffer), i % 2 == 0 ? "%d-WORLD" : "%d-HELLO", j * 100 + i);
@@ -75,10 +75,12 @@ void loops_and_multiscope_test(ScopeContext* S_SCOPE_CONTEXT) {
 					);
 				}
 				SB_APPEND(test);
-			SB_END(str_test);
+				SB_APPEND_INT(5);
+				SB_APPEND_INT(test);
+			});
 			puts(str_test->str);
 			S_RELEASE(str_test);
-		S_SCOPE_END();
+		});
 	}
 }
 
@@ -103,7 +105,7 @@ int main() {
 	S_RELEASE(test);
 	S_RELEASE(test2);
 
-	S_SCOPE_START();
+	S_SCOPE({
 
 		String* ps1 = S_SCOPE_NEW("Hello");
 		String* ps2 = S_SCOPE_NEW("Hello");
@@ -126,13 +128,24 @@ int main() {
 		builder_test_1(S_SCOPE_CONTEXT);
 		builder_test_2(S_SCOPE_CONTEXT);
 
-	S_SCOPE_END();
+	})
 
 	scope_context_free(&context);
 
 	// ===============================================
 	// Release Pool and Quit
 	SP_GLOBAL_FREE();
-	printf("---------------------\nMEMORY BLOCK NOT FREED = %d\n---------------------", sp_alloc_get());
+	malloc(154);
+	malloc(14);
+	malloc(154);
+	malloc(154);
+	malloc(2154);
+	malloc(154);
+	malloc(154);
+	malloc(15545154);
+	malloc(15544);
+	malloc(15400);
+	malloc(154);
+	sp_print_memory_leaks();
 	return 0;
 }

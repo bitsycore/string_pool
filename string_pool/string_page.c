@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc.h"
+#include "../common/alloc.h"
 #include "string_pool_types.h"
 
 StringPage *string_page_alloc() {

@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#include "alloc.h"
+#include "../common/alloc.h"
 #include "string.h"
 
 ScopeContext* scope_context_new() {

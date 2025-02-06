@@ -15,7 +15,8 @@
 #define HASH_TABLE_SIZE 32749 // Prime number 8191, 16381, or 32749
 #define SCOPE_CONTEXT_SIZE 64
 #define STRING_PAGE_SIZE 128
-#define POOR_GRIND 1
+#define ENABLE_LEAK_DETECTOR true
+#define OVERRIDE_REAL_ALLOC true
 
 // ====================
 // SELECTOR

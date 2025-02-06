@@ -29,8 +29,8 @@ add_library(
         string_pool/scope_context.h
         string_pool/string_page.c
         string_pool/string_page.h
-        string_pool/alloc.h
-        string_pool/alloc.c
+        common/alloc.h
+        common/alloc.c
         common/debug.c
         common/debug.h
 )

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc.h"
+#include "../common/alloc.h"
 #include "global_pool.h"
 #include "string.h"
 #include "string_page.h"
