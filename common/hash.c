@@ -74,11 +74,13 @@ uint32_t hash_murmur3_32(const char* str, const uint32_t table_size) {
 	for (int i = 0; i < nb_blocks; i++) {
 		uint32_t k = blocks[i];
 		k *= c1;
-		k = k << r1 | k >> 32 - r1;
+		// ReSharper disable once CppRedundantParentheses
+		k = k << r1 | k >> (32 - r1);
 		k *= c2;
 
 		hash ^= k;
-		hash = hash << r2 | hash >> 32 - r2;
+		// ReSharper disable once CppRedundantParentheses
+		hash = hash << r2 | hash >> (32 - r2);
 		hash = hash * m + n;
 	}
 
@@ -90,7 +92,8 @@ uint32_t hash_murmur3_32(const char* str, const uint32_t table_size) {
 		case 2: k ^= (uint32_t) (tail[1] << 8);
 		case 1: k ^= (uint32_t) tail[0];
 			k *= c1;
-			k = k << r1 | k >> 32 - r1;
+			// ReSharper disable once CppRedundantParentheses
+			k = k << r1 | k >> (32 - r1);
 			k *= c2;
 			hash ^= k;
 		default:;

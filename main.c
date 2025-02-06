@@ -75,8 +75,6 @@ void loops_and_multi_scope_test(ScopeContext* S_SCOPE_CONTEXT) {
 				);
 				}
 				SB_APPEND(test);
-				SB_APPEND_INT(5);
-				SB_APPEND_INT(test);
 				});
 			puts(str_test->str);
 			S_RELEASE(str_test);
