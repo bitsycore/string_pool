@@ -19,7 +19,7 @@
 #define STRING_PAGE_SIZE 128
 
 #define ENABLE_LEAK_DETECTOR true
-#define USE_AREA true
+#define USE_ARENA true
 
 // ====================
 // SELECTOR

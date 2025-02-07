@@ -9,13 +9,13 @@
 // MARK: AREA
 // ============================================
 
-#if USE_AREA == true
-#include "area.h"
-#define selected_malloc area_malloc
-#define selected_calloc area_calloc
-#define selected_realloc area_realloc
-#define selected_free area_free
-#define selected_strdup area_strdup
+#if USE_ARENA == true
+#include "arena.h"
+#define selected_malloc arena_malloc
+#define selected_calloc arena_calloc
+#define selected_realloc arena_realloc
+#define selected_free arena_free
+#define selected_strdup arena_strdup
 #else
 #include <stdlib.h>
 #define selected_malloc malloc
@@ -32,9 +32,13 @@
 #if ENABLE_LEAK_DETECTOR == true
 
 void* imp_ml_malloc(void* (*custom_malloc)(size_t), size_t size, const char* file, int line);
+
 void* imp_ml_calloc(void* (*custom_calloc)(size_t, size_t), size_t num, size_t size, const char* file, int line);
+
 void* imp_ml_realloc(void* (*custom_realloc)(void*, size_t), void* ptr, size_t size, const char* file, int line);
+
 void imp_ml_free(void (*custom_free)(void*), void* ptr);
+
 char* imp_ml_strdup(void* (*custom_malloc)(size_t), const char* s, const char* file, int line);
 
 #define ml_malloc(size) imp_ml_malloc(selected_malloc, size, __FILE__, __LINE__)
@@ -44,6 +48,7 @@ char* imp_ml_strdup(void* (*custom_malloc)(size_t), const char* s, const char* f
 #define ml_strdup(s) imp_ml_strdup(selected_malloc, s, __FILE__, __LINE__)
 
 void ml_print_memory_leaks();
+
 void ml_cleanup_memory_tracking();
 
 #else

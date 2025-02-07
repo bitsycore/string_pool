@@ -1,4 +1,4 @@
-#include "area.h"
+#include "arena.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -18,18 +18,18 @@ typedef struct Area {
 } Area;
 
 // avoid excessive fragmentation
-#define MIN_BLOCK_SIZE_CALCULATE  (MIN_BLOCK_SIZE * sizeof(Block))
+#define MIN_BLOCK_SIZE_CALCULATE  (ARENA_MIN_BLOCK_SIZE * sizeof(Block))
 
 static Area* AREAS = NULL;
 
 static Area* allocate_new_area() {
-	if (AREA_DEBUG) printf("[AREA] New Area Allocated\n");
-	Area* new_area = malloc(sizeof(Area) + AREA_SIZE);
+	if (ARENA_DEBUG) printf("[AREA] New Area Allocated\n");
+	Area* new_area = malloc(sizeof(Area) + ARENA_SIZE);
 	if (!new_area) return NULL;
 	new_area->next = AREAS;
 	AREAS = new_area;
 	Block* block = new_area->blocks;
-	block->size = AREA_SIZE - sizeof(Block);
+	block->size = ARENA_SIZE - sizeof(Block);
 	block->free = true;
 	block->next = NULL;
 	return new_area;
@@ -75,7 +75,7 @@ static void merge_blocks() {
 // MARK: Public
 // ========================================================
 
-void* area_malloc(const size_t size) {
+void* arena_malloc(const size_t size) {
 	if (size == 0) return NULL;
 
 	Block* block = find_free_block(size);
@@ -96,38 +96,38 @@ void* area_malloc(const size_t size) {
 	return new_block + 1;
 }
 
-void* area_calloc(const size_t num, const size_t size) {
-	void* ptr = area_malloc(num * size);
+void* arena_calloc(const size_t num, const size_t size) {
+	void* ptr = arena_malloc(num * size);
 	if (ptr) memset(ptr, 0, num * size);
 	return ptr;
 }
 
-void* area_realloc(void* ptr, const size_t size) {
-	if (!ptr) return area_malloc(size);
+void* arena_realloc(void* ptr, const size_t size) {
+	if (!ptr) return arena_malloc(size);
 
 	const Block* block = (Block*) ptr - 1;
 	if (block->size >= size) return ptr;
-	void* new_ptr = area_malloc(size);
+	void* new_ptr = arena_malloc(size);
 	if (new_ptr) {
 		memcpy(new_ptr, ptr, block->size);
-		area_free(ptr);
+		arena_free(ptr);
 	}
 	return new_ptr;
 }
 
-void area_free(void* ptr) {
+void arena_free(void* ptr) {
 	if (!ptr) return;
 	Block* block = (Block*) ptr - 1;
 	block->free = true;
 	merge_blocks();
 }
 
-char* area_strdup(const char* s) {
+char* arena_strdup(const char* s) {
 	int len = 0;
 	while (s[len])
 		len++;
 
-	char* str = area_malloc(len + 1);
+	char* str = arena_malloc(len + 1);
 	char* p = str;
 	while (*s != '\0') {
 		*p = *s;
@@ -142,7 +142,7 @@ char* area_strdup(const char* s) {
 // MARK: Area Managing
 // ========================================================
 
-void area_preheat(const int num_areas) {
+void arena_preheat(const int num_areas) {
 	for (int i = 0; i < num_areas; ++i) {
 		if (allocate_new_area() == NULL) {
 			fprintf(stderr, "Failed to preheat area %d\n", i);
@@ -151,7 +151,7 @@ void area_preheat(const int num_areas) {
 	}
 }
 
-void area_destroy() {
+void arena_destroy() {
 	while (AREAS) {
 		Area* next_area = AREAS->next;
 		free(AREAS);

@@ -33,8 +33,8 @@ add_library(
         common/memory_leak.c
         common/debug.c
         common/debug.h
-        common/area.c
-        common/area.h
+        common/arena.c
+        common/arena.h
 )
 
 if (WIN32)

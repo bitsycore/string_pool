@@ -60,7 +60,8 @@ void* imp_ml_malloc(void* (*custom_malloc)(size_t), const size_t size, const cha
 }
 
 
-void* imp_ml_calloc(void* (*custom_calloc)(size_t, size_t), const size_t num, const size_t size, const char* file, const int line) {
+void* imp_ml_calloc(void* (*custom_calloc)(size_t, size_t), const size_t num, const size_t size, const char* file,
+                    const int line) {
 	void* ptr = custom_calloc(num, size);
 	if (ptr != NULL) {
 		const size_t total_size = num * size;
@@ -69,7 +70,8 @@ void* imp_ml_calloc(void* (*custom_calloc)(size_t, size_t), const size_t num, co
 	return ptr;
 }
 
-void* imp_ml_realloc(void* (*custom_realloc)(void*, size_t), void* ptr, const size_t size, const char* file, const int line) {
+void* imp_ml_realloc(void* (*custom_realloc)(void*, size_t), void* ptr, const size_t size, const char* file,
+                     const int line) {
 	void* new_ptr = custom_realloc(ptr, size);
 	if (new_ptr != NULL) {
 		if (ptr != NULL) {

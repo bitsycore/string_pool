@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "common/area.h"
+#include "common/arena.h"
 #include "common/error_handling.h"
 #include "common/memory_leak.h"
 #include "string_pool/api.h"
@@ -28,12 +28,12 @@ void test_builder_scoped_delegate(ScopeContext* S_SCOPE_CTX) {
 
 void test_builder_scoped_block(ScopeContext* S_SCOPE_CTX) {
 	SB_SCOPED(final_string, {
-		SB_APPEND_STR("Hello");
-		SB_APPEND_STR(" ");
-		SB_APPEND_STR("World");
-		SB_APPEND_STR(" ");
-		SB_APPEND_STR("Hello");
-	})
+	          SB_APPEND_STR("Hello");
+	          SB_APPEND_STR(" ");
+	          SB_APPEND_STR("World");
+	          SB_APPEND_STR(" ");
+	          SB_APPEND_STR("Hello");
+	          })
 	puts(final_string->str);
 }
 
@@ -91,8 +91,8 @@ void test_loops_and_multi_scope(ScopeContext* S_SCOPE_CTX) {
 					);
 				}
 				SB_APPEND(test);
-			SB_SCOPED_END(str_test)
-			printf("String builder built %zu chars\n", str_test->length);
+		SB_SCOPED_END(str_test)
+		printf("String builder built %zu chars\n", str_test->length);
 		S_SCOPE_END()
 	}
 }
@@ -161,6 +161,6 @@ int main() {
 	// Release Pool and Quit
 	SP_GLOBAL_FREE();
 	ml_print_memory_leaks();
-	area_destroy();
+	arena_destroy();
 	return 0;
 }
