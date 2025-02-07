@@ -7,11 +7,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/alloc.h"
+#include "../common/memory_leak.h"
 #include "string_pool_types.h"
 
 StringPage *string_page_alloc() {
-    StringPage* string_page = sp_malloc(sizeof(StringPage));
+    StringPage* string_page = ml_malloc(sizeof(StringPage));
     string_page->count = 0;
     string_page->next = NULL;
 
@@ -23,7 +23,7 @@ StringPage *string_page_alloc() {
 void string_page_free(StringPage *string_page) {
     if (!string_page) return;
     string_page_free(string_page->next);
-    sp_free(string_page);
+    ml_free(string_page);
 }
 
 String* string_page_next_string(StringPage *string_page) {

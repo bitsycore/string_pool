@@ -7,11 +7,11 @@
 
 #include <stdlib.h>
 
-#include "../common/alloc.h"
+#include "../common/memory_leak.h"
 #include "string.h"
 
 ScopeContext* scope_context_new() {
-	ScopeContext* context = sp_malloc(sizeof(ScopeContext));
+	ScopeContext* context = ml_malloc(sizeof(ScopeContext));
 	if (!context)
 		EXIT_ERROR("Failed to allocate ScopeContext");
 	context->count = 0;
@@ -55,6 +55,6 @@ void scope_context_free(ScopeContext** context) { // NOLINT(*-no-recursion)
 
 	scope_context_free(&in_context->next);
 
-	sp_free(*context);
+	ml_free(*context);
 	context = NULL;
 }

@@ -29,16 +29,19 @@ add_library(
         string_pool/scope_context.h
         string_pool/string_page.c
         string_pool/string_page.h
-        common/alloc.h
-        common/alloc.c
+        common/memory_leak.h
+        common/memory_leak.c
         common/debug.c
         common/debug.h
+        common/area.c
+        common/area.h
 )
 
 if (WIN32)
     # Dbghelp.lib for call stack
     target_link_libraries(StringPool dbghelp)
 elseif (UNIX)
+    target_link_libraries(StringPool m)
 #    find_library(DL_LIBRARY dl)
 #    if(DL_LIBRARY)
 #        target_link_libraries(StringPool ${DL_LIBRARY})
@@ -51,5 +54,6 @@ endif ()
 # MARK: Test Project
 # ==============================================================================
 
-add_executable(testStringPool main.c)
+add_executable(testStringPool main.c
+)
 target_link_libraries(testStringPool StringPool)

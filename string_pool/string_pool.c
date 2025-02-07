@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/alloc.h"
+#include "../common/memory_leak.h"
 #include "global_pool.h"
 #include "string.h"
 #include "string_page.h"
@@ -64,7 +64,7 @@ size_t string_pool_count_ref(StringPool* pool) {
 }
 
 StringPool* string_pool_new() {
-	StringPool* pool = sp_malloc(sizeof(StringPool));
+	StringPool* pool = ml_malloc(sizeof(StringPool));
 	if (!pool)
 		EXIT_ERROR("Failed to allocate String Pool");
 
@@ -114,6 +114,6 @@ void string_pool_free(StringPool** in_pool) {
 		WARN(buffer);
 	}
 
-	sp_free(pool);
+	ml_free(pool);
 	*in_pool = NULL;
 }

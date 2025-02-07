@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/alloc.h"
+#include "../common/memory_leak.h"
 #include "config.h"
 #include "global_pool.h"
 #include "string_page.h"
@@ -22,12 +22,12 @@
 // =========================================
 
 void string_free(const String* ps) {
-	sp_free(ps->str);
+	ml_free(ps->str);
 }
 
 String* string_next(StringPage* string_page, const char* str, const size_t index) {
 	String* new_string = string_page_next_string(string_page);
-	new_string->str = sp_strdup(str);
+	new_string->str = ml_strdup(str);
 	new_string->length = strlen(str);
 	new_string->ref_count = 1;
 	new_string->hash_index = index;
@@ -150,7 +150,7 @@ static const char* internal_string_replace_str(
 	}
 
 	const size_t result_len = original_str_int + count * (replacement_len - target_len);
-	char* result_str = sp_malloc(result_len + 1);
+	char* result_str = ml_malloc(result_len + 1);
 	if (!result_str) {
 		EXIT_ERROR("Failed to allocate memory for replace result string");
 	}
@@ -210,7 +210,7 @@ String* string_replace(StringPool* pool, const String* original, const char* tar
 	);
 
 	String* result = string_new(pool, result_str);
-	sp_free((void*) result_str);
+	ml_free((void*) result_str);
 
 	return result;
 }

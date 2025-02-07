@@ -4,14 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/alloc.h"
+#include "../common/memory_leak.h"
 #include "global_pool.h"
 #include "string.h"
 #include "string_pool_types.h"
 #include "../common/error_handling.h"
 
 StringBuilder* string_builder_new(StringPool* pool) {
-	StringBuilder* builder = sp_malloc(sizeof(StringBuilder));
+	StringBuilder* builder = ml_malloc(sizeof(StringBuilder));
 	if (!builder)
 		EXIT_ERROR("Failed to allocate StringBuilder");
 
@@ -23,14 +23,14 @@ StringBuilder* string_builder_new(StringPool* pool) {
 }
 
 static StringBuilderNode* string_builder_node_new(const char* str) {
-	StringBuilderNode* node = sp_malloc(sizeof(StringBuilderNode));
+	StringBuilderNode* node = ml_malloc(sizeof(StringBuilderNode));
 	if (!node)
 		EXIT_ERROR("Failed to allocate StringBuilderNode");
 
 	node->type = STRING_BUILDER_NODE_TYPE_STR;
-	node->str = sp_strdup(str);
+	node->str = ml_strdup(str);
 	if (!node->str) {
-		sp_free(node);
+		ml_free(node);
 		EXIT_ERROR("Failed to allocate memory for strdup");
 	}
 
@@ -39,7 +39,7 @@ static StringBuilderNode* string_builder_node_new(const char* str) {
 }
 
 static StringBuilderNode* string_builder_node_new_string(String* string) {
-	StringBuilderNode* node = sp_malloc(sizeof(StringBuilderNode));
+	StringBuilderNode* node = ml_malloc(sizeof(StringBuilderNode));
 	if (!node)
 		EXIT_ERROR("Failed to allocate StringBuilderNode");
 	node->type = STRING_BUILDER_NODE_TYPE_STRING;
@@ -95,7 +95,7 @@ void string_builder_append_format(StringBuilder* builder, const char* format, ..
 		return;
 	}
 
-	char* buffer = sp_malloc(size + 1);
+	char* buffer = ml_malloc(size + 1);
 	if (!buffer)
 		EXIT_ERROR("Failed to allocate memory for formatted string");
 
@@ -105,7 +105,7 @@ void string_builder_append_format(StringBuilder* builder, const char* format, ..
 
 
 	string_builder_append_str(builder, buffer);
-	sp_free(buffer);
+	ml_free(buffer);
 }
 
 void string_builder_append_string(StringBuilder* builder, String* string) {
@@ -135,7 +135,7 @@ String* string_builder_to_string(StringBuilder* builder) {
 	StringBuilderNode* current = builder->strings;
 
 	// Count total length and store the string in array
-	StringBuilderNode** nodes = sp_malloc(sizeof(StringBuilderNode*) * builder->count);
+	StringBuilderNode** nodes = ml_malloc(sizeof(StringBuilderNode*) * builder->count);
 	if (!nodes)
 		EXIT_ERROR("Failed to allocate memory for nodes array");
 
@@ -152,7 +152,7 @@ String* string_builder_to_string(StringBuilder* builder) {
 		current = current->next;
 	}
 
-	char* result = sp_malloc(total_length + 1);
+	char* result = ml_malloc(total_length + 1);
 	if (!result)
 		EXIT_ERROR("Failed to allocate result string");
 	result[0] = '\0';
@@ -167,8 +167,8 @@ String* string_builder_to_string(StringBuilder* builder) {
 
 	String* final_string = string_new(builder->pool, result);
 
-	sp_free(result);
-	sp_free(nodes);
+	ml_free(result);
+	ml_free(nodes);
 
 	return final_string;
 }
@@ -187,14 +187,14 @@ void string_builder_release(StringBuilder** in_builder) {
 		current = current->next;
 
 		if (temp->type == STRING_BUILDER_NODE_TYPE_STR) {
-			sp_free(temp->str);
+			ml_free(temp->str);
 		} else if (temp->type == STRING_BUILDER_NODE_TYPE_STRING) {
 			string_release(&temp->string);
 		}
 
-		sp_free(temp);
+		ml_free(temp);
 	}
 
-	sp_free(builder);
+	ml_free(builder);
 	*in_builder = NULL;
 }
