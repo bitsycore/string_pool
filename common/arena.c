@@ -1,160 +1,186 @@
 #include "arena.h"
 
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
 
-typedef struct Block {
-	size_t size;
-	bool free;
-	struct Block* next;
-} Block;
+#include "error_handling.h"
 
-typedef struct Area {
-	struct Area* next;
-	Block blocks[];
-} Area;
+// =========================================
+// MARK: Macro Helpers
+// =========================================
 
-// avoid excessive fragmentation
-#define MIN_BLOCK_SIZE_CALCULATE  (ARENA_MIN_BLOCK_SIZE * sizeof(Block))
+#if defined(__STDALIGN_H__) && defined(max_align_t)
+    #include <stdalign.h>
+    #define ARENA_MAX_ALIX alignof(max_align_t);
+#else
+#define ARENA_MAX_ALIX sizeof(void*);
+#endif
 
-static Area* AREAS = NULL;
+// =========================================
+// MARK: Global Arena
+// =========================================
 
-static Area* allocate_new_area() {
-	if (ARENA_DEBUG) printf("[AREA] New Area Allocated\n");
-	Area* new_area = malloc(sizeof(Area) + ARENA_SIZE);
-	if (!new_area) return NULL;
-	new_area->next = AREAS;
-	AREAS = new_area;
-	Block* block = new_area->blocks;
-	block->size = ARENA_SIZE - sizeof(Block);
-	block->free = true;
-	block->next = NULL;
-	return new_area;
-}
+static Arena* GLOBAL_ARENA = NULL;
 
-static Block* find_free_block(const size_t size) {
-	for (Area* area = AREAS; area; area = area->next) {
-		Block* block = area->blocks;
-		while (block) {
-			if (block->free && block->size >= size) return block;
-			block = block->next;
-		}
+// =========================================
+// MARK: Default Allocators
+// =========================================
+
+ArenaAllocFunc DEFAULT_ALLOC = malloc;
+ArenaFreeFunc DEFAULT_FREE = free;
+
+// =========================================
+// MARK: Internal
+// =========================================
+
+static Arena* internal_arena_new_instance(
+	const size_t size,
+	const ArenaAllocFunc alloc_cb,
+	const ArenaFreeFunc free_cb,
+	const bool expandable
+) {
+	Arena* arena = alloc_cb ? alloc_cb(sizeof(Arena)) : DEFAULT_ALLOC(sizeof(Arena));
+
+	if (!arena) {
+		return NULL;
 	}
-	return NULL;
-}
+	const size_t arena_size = size == 0 ? ARENA_DEFAULT_SIZE : size;
+	arena->start_ptr = alloc_cb ? alloc_cb(arena_size) : DEFAULT_ALLOC(arena_size);
 
-static void split_block(Block* block, const size_t size) {
-	if (block->size >= size + MIN_BLOCK_SIZE_CALCULATE) {
-		Block* new_block = (Block*) ((uint8_t*) (block + 1) + size);
-		new_block->size = block->size - size - sizeof(Block);
-		new_block->free = true;
-		new_block->next = block->next;
-		block->size = size;
-		block->next = new_block;
-	}
-}
-
-static void merge_blocks() {
-	for (Area* area = AREAS; area; area = area->next) {
-		Block* block = area->blocks;
-		while (block && block->next) {
-			if (block->free && block->next->free) {
-				block->size += block->next->size + sizeof(Block);
-				block->next = block->next->next;
-			} else {
-				block = block->next;
-			}
-		}
-	}
-}
-
-// ========================================================
-// MARK: Public
-// ========================================================
-
-void* arena_malloc(const size_t size) {
-	if (size == 0) return NULL;
-
-	Block* block = find_free_block(size);
-	if (block) {
-		split_block(block, size);
-		block->free = false;
-		return block + 1;
-	}
-
-	Area* area = allocate_new_area();
-	if (!area) {
+	if (!arena->start_ptr) {
+		free_cb ? free_cb(arena) : DEFAULT_FREE(arena);
 		return NULL;
 	}
 
-	Block* new_block = area->blocks;
-	split_block(new_block, size);
-	new_block->free = false;
-	return new_block + 1;
+	arena->next_ptr = arena->start_ptr;
+	arena->end_ptr = arena->start_ptr + arena_size;
+	arena->size = arena_size;
+	arena->alloc_func = alloc_cb ? alloc_cb : DEFAULT_ALLOC;
+	arena->free_func = free_cb ? free_cb : DEFAULT_FREE;
+	arena->next_arena = NULL;
+	arena->expandable = expandable;
+
+	return arena;
 }
 
-void* arena_calloc(const size_t num, const size_t size) {
-	void* ptr = arena_malloc(num * size);
-	if (ptr) memset(ptr, 0, num * size);
-	return ptr;
+// =========================================
+// MARK: Arena Management
+// =========================================
+
+Arena* arena_new(const size_t size) {
+	return internal_arena_new_instance(size, NULL, NULL, false);
 }
 
-void* arena_realloc(void* ptr, const size_t size) {
-	if (!ptr) return arena_malloc(size);
 
-	const Block* block = (Block*) ptr - 1;
-	if (block->size >= size) return ptr;
-	void* new_ptr = arena_malloc(size);
-	if (new_ptr) {
-		memcpy(new_ptr, ptr, block->size);
-		arena_free(ptr);
+Arena* arena_new_custom(const size_t size, const ArenaAllocFunc alloc_cb, const ArenaFreeFunc free_cb, const bool expandable) {
+	if (!alloc_cb || !free_cb) {
+		WARN("Error: Custom arena requires both alloc_cb and free_cb.");
+		return NULL;
 	}
-	return new_ptr;
+	return internal_arena_new_instance(size, alloc_cb, free_cb, expandable);
 }
 
-void arena_free(void* ptr) {
-	if (!ptr) return;
-	Block* block = (Block*) ptr - 1;
-	block->free = true;
-	merge_blocks();
-}
+void arena_destroy(Arena** arena) {
+	if (!arena) return;
+	if (!*arena) return;
 
-char* arena_strdup(const char* s) {
-	int len = 0;
-	while (s[len])
-		len++;
-
-	char* str = arena_malloc(len + 1);
-	char* p = str;
-	while (*s != '\0') {
-		*p = *s;
-		p++;
-		s++;
+	Arena* current_arena = *arena;
+	while (current_arena) {
+		Arena* next = current_arena->next_arena;
+		current_arena->free_func(current_arena->start_ptr);
+		current_arena->free_func(current_arena);
+		current_arena = next;
 	}
-	*p = '\0';
-	return str;
+	*arena = NULL;
 }
 
-// ========================================================
-// MARK: Area Managing
-// ========================================================
+// =========================================
+// MARK: Arena Global Function
+// =========================================
 
-void arena_preheat(const int num_areas) {
-	for (int i = 0; i < num_areas; ++i) {
-		if (allocate_new_area() == NULL) {
-			fprintf(stderr, "Failed to preheat area %d\n", i);
-			return;
+void* arena_global_alloc(const size_t size) {
+	return arena_alloc_align(arena_global_get(), size, 0);
+}
+
+Arena* arena_global_get() {
+	if (!GLOBAL_ARENA) {
+		GLOBAL_ARENA = internal_arena_new_instance(ARENA_DEFAULT_SIZE, NULL, NULL, true);
+		if (GLOBAL_ARENA == NULL) {
+			WARN("Error: Failed to initialize global arena.");
+			return NULL;
 		}
 	}
+	return GLOBAL_ARENA;
 }
 
-void arena_destroy() {
-	while (AREAS) {
-		Area* next_area = AREAS->next;
-		free(AREAS);
-		AREAS = next_area;
+void arena_global_destroy() {
+	if (GLOBAL_ARENA) {
+		arena_destroy(&GLOBAL_ARENA);
+	}
+}
+
+// =========================================
+// MARK: Malloc
+// =========================================
+
+void* arena_alloc(Arena* arena, const size_t size) {
+	return arena_alloc_align(arena, size, 0);
+}
+
+void* arena_alloc_align(Arena* arena, const size_t size, size_t alignment) {
+	if (size == 0) return NULL;
+	if (arena == NULL) arena = arena_global_get();
+	if (arena == NULL) return NULL;
+
+	const size_t default_alignment = ARENA_MAX_ALIX;
+
+	// Ensure alignment is a power of 2
+	if (alignment == 0) alignment = default_alignment;
+	else if (alignment & (alignment - 1)) {
+		WARN("Alignment must be a power of 2. Using Default Alignment.");
+		alignment = default_alignment;
+	}
+
+	Arena* current_arena = arena;
+
+	while (current_arena) {
+		char* current_mem = current_arena->next_ptr;
+		const uintptr_t ptr_val = (uintptr_t) current_mem;
+		const size_t padding = ptr_val % alignment ? alignment - ptr_val % alignment : 0;
+		char* aligned_ptr = current_mem + padding;
+
+		// If allocation fits within this arena
+		if (aligned_ptr + size <= (char*) current_arena->end_ptr) {
+			current_arena->next_ptr = aligned_ptr + size;
+			return aligned_ptr;
+		}
+
+		// Move to next arena if available
+		if (!current_arena->next_arena) break;
+		current_arena = current_arena->next_arena;
+	}
+
+
+	// No space in existing arenas;
+	// allocate a new linked one if authorized
+
+	if (arena->expandable == false) return NULL;
+	Arena* new_arena = internal_arena_new_instance(arena->size, arena->alloc_func, arena->free_func, arena->expandable);
+	if (!new_arena) return NULL;
+
+	arena->next_arena = new_arena;
+	return arena_alloc_align(new_arena, size, alignment);
+}
+
+// =========================================
+// MARK: Arena Cleanup
+// =========================================
+
+void arena_reset(Arena* arena) {
+	if (!arena) return;
+	Arena* current_arena = arena;
+	while (current_arena) {
+		current_arena->next_ptr = current_arena->start_ptr;
+		current_arena = current_arena->next_arena;
 	}
 }

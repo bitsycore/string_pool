@@ -3,27 +3,7 @@
 
 #include "../string_pool/config.h"
 #include <stdbool.h>
-#include <stddef.h>
-
-// ============================================
-// MARK: AREA
-// ============================================
-
-#if USE_ARENA == true
-#include "arena.h"
-#define selected_malloc arena_malloc
-#define selected_calloc arena_calloc
-#define selected_realloc arena_realloc
-#define selected_free arena_free
-#define selected_strdup arena_strdup
-#else
 #include <stdlib.h>
-#define selected_malloc malloc
-#define selected_calloc calloc
-#define selected_realloc realloc
-#define selected_free free
-#define selected_strdup strdup
-#endif
 
 // ============================================
 // MARK: LEAK DETECTOR
@@ -32,13 +12,9 @@
 #if ENABLE_LEAK_DETECTOR == true
 
 void* imp_ml_malloc(void* (*custom_malloc)(size_t), size_t size, const char* file, int line);
-
 void* imp_ml_calloc(void* (*custom_calloc)(size_t, size_t), size_t num, size_t size, const char* file, int line);
-
 void* imp_ml_realloc(void* (*custom_realloc)(void*, size_t), void* ptr, size_t size, const char* file, int line);
-
 void imp_ml_free(void (*custom_free)(void*), void* ptr);
-
 char* imp_ml_strdup(void* (*custom_malloc)(size_t), const char* s, const char* file, int line);
 
 #define ml_malloc(size) imp_ml_malloc(selected_malloc, size, __FILE__, __LINE__)

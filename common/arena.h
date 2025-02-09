@@ -8,22 +8,46 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define ARENA_DEBUG true
-#define ARENA_SIZE 1024 * 1024 * 64
-#define ARENA_MIN_BLOCK_SIZE 2
+// =========================================
+// MARK: CONFIG
+// =========================================
 
-void* arena_malloc(size_t size);
+#define ARENA_DEFAULT_SIZE (1024 * 1024 * 4)
 
-void* arena_calloc(size_t num, size_t size);
+// =========================================
+// MARK: Type Definitions
+// =========================================
 
-void* arena_realloc(void* ptr, size_t size);
+typedef void* (*ArenaAllocFunc)(size_t size);
+typedef void (*ArenaFreeFunc)(void* ptr);
 
-void arena_free(void* ptr);
+typedef struct Arena {
+	void* start_ptr;
+	void* next_ptr;
+	void* end_ptr;
+	size_t size;
 
-char* arena_strdup(const char* s);
+	bool expandable;
+	ArenaAllocFunc alloc_func;
+	ArenaFreeFunc free_func;
 
-void arena_preheat(int num_areas);
+	struct Arena* next_arena;
+} Arena;
 
-void arena_destroy();
+// =========================================
+// MARK: Functions
+// =========================================
+
+Arena* arena_new(size_t size);
+Arena* arena_new_custom(size_t size, ArenaAllocFunc alloc_cb, ArenaFreeFunc free_cb, bool expandable);
+void arena_destroy(Arena** arena);
+
+void* arena_global_alloc(size_t size);
+Arena* arena_global_get();
+void arena_global_destroy();
+
+void* arena_alloc(Arena* arena, size_t size);
+void* arena_alloc_align(Arena* arena, size_t size, size_t alignment);
+void arena_reset(Arena* arena);
 
 #endif //AREA_H

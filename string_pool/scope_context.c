@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "../common/memory_leak.h"
+#include "../common/alloc.h"
 #include "string.h"
 
 ScopeContext* scope_context_new() {
@@ -56,5 +57,6 @@ void scope_context_free(ScopeContext** context) { // NOLINT(*-no-recursion)
 	scope_context_free(&in_context->next);
 
 	ml_free(*context);
-	context = NULL;
+
+	*context = NULL;
 }

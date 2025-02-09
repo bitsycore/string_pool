@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "../common/memory_leak.h"
+#include "../common/alloc.h"
 #include "config.h"
 #include "global_pool.h"
 #include "string_page.h"

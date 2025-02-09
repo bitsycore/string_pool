@@ -1,45 +1,42 @@
+#include "common/alloc.h"
+#include "common/memory_leak.h"
+
 #include <stdio.h>
 
-#include "common/arena.h"
 #include "common/error_handling.h"
-#include "common/memory_leak.h"
 #include "string_pool/api.h"
 
-SB_FUN(delegate_sb) {
-	SB_APPEND_STR("Hello");
-	SB_APPEND_INT(5000);
-	SB_APPEND_STR("World 5000");
+void test_builder_scoped(ScopeContext* S_SCOPE_CTX) {
+	SB_SCOPED(final_string) {
+		SB_APPEND_STR("Hello");
+		SB_APPEND_STR(" ");
+		SB_APPEND_STR("World");
+		SB_APPEND_STR(" ");
+		SB_APPEND_STR("Hello");
+	}
+	puts(final_string->str);
 }
 
-SB_FUN(delegate_sb_2) {
-	SB_APPEND_STR("Are you ok ?");
-	SB_APPEND_STR(" ");
-	SB_APPEND_STR("World 5000 -- ");
-	SB_APPEND_FORMAT("%x", 125);
-}
+void test_builder_scoped2(ScopeContext* S_SCOPE_CTX) {
+	SB_SCOPED(final_string) {
+		SB_APPEND_STR("Hello");
+		SB_APPEND_INT(5000);
+		SB_APPEND_STR("World 5000");
+	}
 
-void test_builder_scoped_delegate(ScopeContext* S_SCOPE_CTX) {
-	SB_SCOPED(final_string, SB_RUN(delegate_sb))
-	SB(final_string2, SB_RUN(delegate_sb_2))
+	SB_SCOPED(final_string2) {
+		SB_APPEND_STR("Are you ok ?");
+		SB_APPEND_STR(" ");
+		SB_APPEND_STR("World 5000 -- ");
+		SB_APPEND_FORMAT("%x", 125);
+	}
+
 	puts(final_string->str);
 	puts(final_string2->str);
-	S_RELEASE(final_string2);
-}
-
-void test_builder_scoped_block(ScopeContext* S_SCOPE_CTX) {
-	SB_SCOPED(final_string, {
-	          SB_APPEND_STR("Hello");
-	          SB_APPEND_STR(" ");
-	          SB_APPEND_STR("World");
-	          SB_APPEND_STR(" ");
-	          SB_APPEND_STR("Hello");
-	          })
-	puts(final_string->str);
 }
 
 void test_builder(ScopeContext* S_SCOPE_CTX) {
-	String* abc = SB_START()
-
+	SB(abc) {
 		const String* test = S_SCOPE_NEW("Test replace NEW, and the NEW");
 		String* replaced = S_SCOPE_REPLACE(test, "NEW", "");
 
@@ -53,8 +50,7 @@ void test_builder(ScopeContext* S_SCOPE_CTX) {
 		SB_APPEND_FORMAT("%s, ", "BOB");
 		SB_APPEND_STR("Age: ");
 		SB_APPEND_FORMAT("%d", age);
-
-	SB_END(abc)
+	}
 
 	puts(abc->str);
 	S_RELEASE(abc);
@@ -76,9 +72,10 @@ void test_string_cmp(const String* ps1, const String* ps2, const String* ps3) {
 
 void test_loops_and_multi_scope(ScopeContext* S_SCOPE_CTX) {
 	String* test = S_SCOPE_NEW("Test");
+
 	for (int j = 0; j < 10; j++) {
-		S_SCOPE_START()
-			String* str_test = SB_SCOPED_START()
+		S_SCOPE() {
+			SB_SCOPED(str_test) {
 				for (int i = 0; i < 1000; i++) {
 					char buffer[10 + 20];
 					snprintf(buffer, sizeof(buffer), i % 2 == 0 ? "%d-WORLD" : "%d-HELLO", j * 100 + i);
@@ -91,9 +88,9 @@ void test_loops_and_multi_scope(ScopeContext* S_SCOPE_CTX) {
 					);
 				}
 				SB_APPEND(test);
-		SB_SCOPED_END(str_test)
-		printf("String builder built %zu chars\n", str_test->length);
-		S_SCOPE_END()
+			}
+			printf("String builder built %zu chars\n", str_test->length);
+		}
 	}
 }
 
@@ -122,7 +119,51 @@ ScopeContext* test_scope_manual() {
 	return context;
 }
 
+void test_end_scope_manual(ScopeContext** context) {
+    scope_context_free(context);
+}
+
+void* imp_malloc(size_t size) {
+	return ml_malloc(size);
+}
+
+void imp_free(void* ptr) {
+	ml_free(ptr);
+}
+
 int main() {
+	Arena* arena = arena_new_custom(sizeof(String)*2, imp_malloc, imp_free, false);
+	for (int i = 0; i < 100; i++) {
+		String* string = arena_alloc(arena, sizeof(String));
+		printf("String: %p\n", (void *) string);
+	}
+	arena_destroy(&arena);
+	SB(StringResult){
+		SB_APPEND_STR("HELLO WORLD");
+		SB_APPEND_STR("----------------------");
+		SB_APPEND_STR("HELLO WORLD");
+		SB_APPEND_STR("----------------------");
+		SB_APPEND_STR("HELLO WORLD");
+		SB_APPEND_STR("HELLO WORLD");
+		SB_APPEND_STR("----------------------");
+		SB_APPEND_STR("HELLO WORLD");
+		SB_APPEND_STR("----------------------");
+		SB_APPEND_STR("HELLO WORLD");
+		SB_APPEND_STR("----------------------");
+		SB_APPEND_STR("HELLO WORLD");
+		SB_APPEND_STR("HELLO WORLD");
+	}
+
+	puts(StringResult->str);
+	S_RELEASE(StringResult);
+
+	S_SCOPE() {
+		const String* test1 = S_SCOPE_NEW("Hello");
+		const String* test2 = S_SCOPE_NEW("Hello World");
+		puts(test1->str);
+		puts(test2->str);
+	}
+
 	ScopeContext* scope_ctx = test_scope_manual();
 
 	test_s_new();
@@ -139,7 +180,7 @@ int main() {
 	// STRING_FIND test
 	test_string_find(ps1);
 
-	S_SCOPE({
+	S_SCOPE() {
 		// ===============================================
 		// Lots of init test
 		test_loops_and_multi_scope(S_SCOPE_CTX);
@@ -147,20 +188,20 @@ int main() {
 		// ===============================================
 		// BUILDER TEST
 		test_builder(S_SCOPE_CTX);
-		test_builder_scoped_delegate(S_SCOPE_CTX);
-		test_builder_scoped_block(S_SCOPE_CTX);
-		})
+		test_builder_scoped2(S_SCOPE_CTX);
+		test_builder_scoped(S_SCOPE_CTX);
+	}
 
 	S_RELEASE(ps1);
 	S_RELEASE(ps2);
 	S_RELEASE(ps3);
 
-	scope_context_free(&scope_ctx);
+	test_end_scope_manual(&scope_ctx);
 
 	// ===============================================
 	// Release Pool and Quit
 	SP_GLOBAL_FREE();
 	ml_print_memory_leaks();
-	arena_destroy();
+	arena_global_destroy();
 	return 0;
 }

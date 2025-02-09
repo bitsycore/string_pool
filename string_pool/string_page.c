@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "../common/memory_leak.h"
+#include "../common/alloc.h"
 #include "string_pool_types.h"
 
 StringPage *string_page_alloc() {

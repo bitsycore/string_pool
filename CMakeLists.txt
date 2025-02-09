@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(testStringPool C)
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 # ==============================================================================
@@ -35,6 +35,8 @@ add_library(
         common/debug.h
         common/arena.c
         common/arena.h
+        common/alloc.c
+        common/alloc.h
 )
 
 if (WIN32)
