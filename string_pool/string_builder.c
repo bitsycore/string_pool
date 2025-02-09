@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/alloc.h"
 #include "../common/memory_leak.h"
 
 #include "global_pool.h"

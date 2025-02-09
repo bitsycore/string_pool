@@ -118,23 +118,23 @@ void ml_print_memory_leaks() {
 	size_t number_leaked_block = 0;
 
 	printf("\n--------------------- [MEMORY LEAK DETECTED] ---------------------\n\n");
-	while (current != NULL) {
-		if ((double) current->size >= 1024 * 1024 * 2.5) {
-			printf("[%zu]\t0x%p\t%.2f MB\t%s:%d\n",
-			       number_leaked_block, current->address,
-			       (double) current->size / (1024 * 1024),
-			       current->file, current->line);
-		} else if ((double) current->size >= 1024 * 2.5) {
-			printf("[%zu]\t0x%p\t%.2f KB\t%s:%d\n",
-			       number_leaked_block, current->address,
-			       (double) current->size / 1024,
-			       current->file, current->line);
+	while (current != NULL) {;
+		char size_str[11];
+		static const int GB = 1024 * 1024 * 1024;
+		static const int MB = 1024 * 1024;
+		static const int KB = 1024;
+		if (current->size >= GB) {
+			snprintf(size_str, sizeof(size_str), "%.2f GB", (double) current->size / GB);
+		} else if ((double) current->size >= MB) {
+			snprintf(size_str, sizeof(size_str), "%.2f MB", (double) current->size / MB);
+		} else if ((double) current->size >= KB) {
+			snprintf(size_str, sizeof(size_str), "%.2f KB", (double) current->size / KB);
 		} else {
-			printf("[%zu]\t0x%p\t%zu Bytes\t%s:%d\n",
-			       number_leaked_block, current->address,
-			       current->size,
-			       current->file, current->line);
+			snprintf(size_str, sizeof(size_str), "%zu Bytes", current->size);
 		}
+
+		printf("[%zu]    0x%p    %-11s    %s:%d\n",
+			   number_leaked_block, current->address, size_str, current->file, current->line);
 		total_leaked_memory += current->size;
 		current = current->next;
 		number_leaked_block++;

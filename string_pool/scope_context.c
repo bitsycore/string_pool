@@ -8,7 +8,6 @@
 #include <stdlib.h>
 
 #include "../common/memory_leak.h"
-#include "../common/alloc.h"
 #include "string.h"
 
 ScopeContext* scope_context_new() {

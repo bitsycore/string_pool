@@ -17,11 +17,11 @@ void* imp_ml_realloc(void* (*custom_realloc)(void*, size_t), void* ptr, size_t s
 void imp_ml_free(void (*custom_free)(void*), void* ptr);
 char* imp_ml_strdup(void* (*custom_malloc)(size_t), const char* s, const char* file, int line);
 
-#define ml_malloc(size) imp_ml_malloc(selected_malloc, size, __FILE__, __LINE__)
-#define ml_calloc(num, size) imp_ml_calloc(selected_calloc, num, size, __FILE__, __LINE__)
-#define ml_realloc(ptr, size) imp_ml_realloc(selected_realloc, ptr, size, __FILE__, __LINE__)
-#define ml_free(ptr) imp_ml_free(selected_free, ptr)
-#define ml_strdup(s) imp_ml_strdup(selected_malloc, s, __FILE__, __LINE__)
+#define ml_malloc(size) imp_ml_malloc(malloc, size, __FILE__, __LINE__)
+#define ml_calloc(num, size) imp_ml_calloc(calloc, num, size, __FILE__, __LINE__)
+#define ml_realloc(ptr, size) imp_ml_realloc(realloc, ptr, size, __FILE__, __LINE__)
+#define ml_free(ptr) imp_ml_free(free, ptr)
+#define ml_strdup(s) imp_ml_strdup(malloc, s, __FILE__, __LINE__)
 
 void ml_print_memory_leaks();
 

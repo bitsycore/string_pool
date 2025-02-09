@@ -1,9 +1,11 @@
 #include "arena.h"
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "error_handling.h"
+#include "memory_leak.h"
 
 // =========================================
 // MARK: Macro Helpers
@@ -26,8 +28,17 @@ static Arena* GLOBAL_ARENA = NULL;
 // MARK: Default Allocators
 // =========================================
 
-ArenaAllocFunc DEFAULT_ALLOC = malloc;
-ArenaFreeFunc DEFAULT_FREE = free;
+
+void* custom_malloc(size_t size) {
+	return imp_ml_malloc(malloc, size, __FILE__, __LINE__);
+}
+
+void custom_free(void* ptr) {
+	imp_ml_free(free, ptr);
+}
+
+ArenaAllocFunc DEFAULT_ALLOC = custom_malloc;
+ArenaFreeFunc DEFAULT_FREE = custom_free;
 
 // =========================================
 // MARK: Internal
@@ -73,10 +84,6 @@ Arena* arena_new(const size_t size) {
 
 
 Arena* arena_new_custom(const size_t size, const ArenaAllocFunc alloc_cb, const ArenaFreeFunc free_cb, const bool expandable) {
-	if (!alloc_cb || !free_cb) {
-		WARN("Error: Custom arena requires both alloc_cb and free_cb.");
-		return NULL;
-	}
 	return internal_arena_new_instance(size, alloc_cb, free_cb, expandable);
 }
 

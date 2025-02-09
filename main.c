@@ -1,8 +1,8 @@
-#include "common/alloc.h"
 #include "common/memory_leak.h"
 
 #include <stdio.h>
 
+#include "common/arena.h"
 #include "common/error_handling.h"
 #include "string_pool/api.h"
 
@@ -123,21 +123,17 @@ void test_end_scope_manual(ScopeContext** context) {
     scope_context_free(context);
 }
 
-void* imp_malloc(size_t size) {
-	return ml_malloc(size);
-}
-
-void imp_free(void* ptr) {
-	ml_free(ptr);
-}
-
 int main() {
-	Arena* arena = arena_new_custom(sizeof(String)*2, imp_malloc, imp_free, false);
+	Arena* arena = arena_new_custom(sizeof(String)*2, NULL, NULL, false);
+	Arena* arena2 = arena_new_custom(1024*999, NULL, NULL, false);
 	for (int i = 0; i < 100; i++) {
 		String* string = arena_alloc(arena, sizeof(String));
 		printf("String: %p\n", (void *) string);
 	}
 	arena_destroy(&arena);
+
+	arena_global_alloc(sizeof(String)*2);
+
 	SB(StringResult){
 		SB_APPEND_STR("HELLO WORLD");
 		SB_APPEND_STR("----------------------");
@@ -202,6 +198,6 @@ int main() {
 	// Release Pool and Quit
 	SP_GLOBAL_FREE();
 	ml_print_memory_leaks();
-	arena_global_destroy();
+	//arena_global_destroy();
 	return 0;
 }

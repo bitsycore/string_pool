@@ -35,8 +35,6 @@ add_library(
         common/debug.h
         common/arena.c
         common/arena.h
-        common/alloc.c
-        common/alloc.h
 )
 
 if (WIN32)
